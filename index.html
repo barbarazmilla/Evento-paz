@@ -313,6 +313,50 @@
       margin: 2rem auto;
     }
 
+    /* ── SPONSORS ── */
+    .sponsors {
+      padding: 2rem 1.5rem 3rem;
+      text-align: center;
+    }
+
+    .sponsors-label {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 300;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(245,239,230,0.35);
+      margin-bottom: 1.8rem;
+    }
+
+    .sponsors-logos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem 3rem;
+    }
+
+    .sponsor-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.45;
+      transition: opacity 0.3s;
+      flex-shrink: 0;
+    }
+    .sponsor-logo:hover { opacity: 0.9; }
+
+    .sponsor-logo img {
+      height: 40px;
+      width: auto;
+    }
+
+    @media (max-width: 600px) {
+      .sponsors-logos { gap: 1.5rem 2rem; }
+      .sponsor-logo img { height: 32px; }
+    }
+
     /* ── FOOTER ── */
     footer {
       padding: 2rem;
@@ -399,6 +443,18 @@
     <p class="closing-title">Wine Experience by Paz Cornú</p>
     <p class="closing-text">Los mejores vinos, moda en vivo y una experiencia que no se repite.</p>
     <div class="divider"></div>
+  </section>
+
+  <!-- ══ SPONSORS ══ -->
+  <section class="sponsors">
+    <p class="sponsors-label">Con el apoyo de</p>
+    <div class="sponsors-logos">
+      <div class="sponsor-logo"><img src="assets/logos/baireswine.svg" alt="Baires Wine"></div>
+      <div class="sponsor-logo"><img src="assets/logos/moschini.svg" alt="Bodega Moschini"></div>
+      <div class="sponsor-logo"><img src="assets/logos/dellanzo.svg" alt="Familia Dellanzo"></div>
+      <div class="sponsor-logo"><img src="assets/logos/chocolates.svg" alt="Cocoabit Chocolates"></div>
+      <div class="sponsor-logo"><img src="assets/logos/oria.svg" alt="Oria"></div>
+    </div>
   </section>
 
   <footer>© 2026 Paz Cornú · Colección Éter · Todos los derechos reservados</footer>
