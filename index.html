@@ -892,6 +892,7 @@
       var data = new FormData(this);
       data.append('tipo_entrada', document.getElementById('modalTicketType').textContent);
       data.append('fecha', new Date().toLocaleString('es-AR'));
+      data.append('estado_pago', 'Pendiente');
 
       var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyaE0npm7Y2oE54XKU3AU_yw8-CC4LwDf3ws4syNuJag1xV5LVrfiTLYvmSbxA-xkYX/exec';
 
