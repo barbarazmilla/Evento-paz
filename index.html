@@ -476,6 +476,107 @@
       background: rgba(20,10,8,0.5);
     }
 
+    /* ── POPUP MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal {
+      background: linear-gradient(160deg, #1a0f0b, #110a08);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      transform: translateY(20px);
+      transition: transform 0.35s ease;
+    }
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.2rem;
+    }
+    .modal-info {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--cream);
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .modal-info strong {
+      color: var(--gold);
+    }
+    .modal-ticket-type {
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.5);
+      margin-bottom: 0.5rem;
+    }
+    .modal-btn {
+      display: inline-block;
+      padding: 0.85rem 2.5rem;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-decoration: none;
+      background: var(--gold);
+      color: var(--dark);
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin-top: 0.5rem;
+    }
+    .modal-btn:hover {
+      background: #b8963f;
+      transform: scale(1.03);
+    }
+    .modal-close {
+      display: block;
+      margin-top: 1rem;
+      font-family: 'Raleway', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: rgba(201,168,76,0.35);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .modal-close:hover {
+      color: rgba(201,168,76,0.7);
+    }
+    @media (max-width: 480px) {
+      .modal { padding: 2rem 1.5rem; }
+      .modal-title { font-size: 1rem; }
+      .modal-info { font-size: 0.9rem; }
+    }
+
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(28px); }
@@ -527,7 +628,7 @@
           DJ Set: Maik Costa
         </p>
         <!-- 🔗 Link de pago General -->
-        <a href="https://mpago.li/1kxBrx5" target="_blank" class="btn">Comprar General</a>
+        <a href="#" class="btn" onclick="showModal('General', '$70.000', 'https://mpago.li/1kxBrx5'); return false;">Comprar General</a>
       </div>
 
       <!-- VIP -->
@@ -540,7 +641,7 @@
           <strong>Beneficios y descuentos únicos</strong>
         </p>
         <!-- 🔗 Link de pago VIP -->
-        <a href="https://mpago.li/1hRHsui" target="_blank" class="btn btn-filled">Comprar VIP</a>
+        <a href="#" class="btn btn-filled" onclick="showModal('VIP', '$100.000', 'https://mpago.li/1hRHsui'); return false;">Comprar VIP</a>
       </div>
 
     </div>
@@ -567,6 +668,37 @@
   </section>
 
   <footer>© 2026 Paz Cornú · Colección Éter · Todos los derechos reservados</footer>
+
+  <!-- ══ POPUP MODAL ══ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <p class="modal-ticket-type" id="modalTicketType"></p>
+      <h3 class="modal-title">Wine Experience by Paz Cornú</h3>
+      <div class="modal-info">
+        <strong>📅 Sábado 26 de Abril, 2026</strong><br>
+        🕔 20:00 hs<br>
+        📍 Finca Monteflores, Buenos Aires<br><br>
+        Desfile Colección Éter · Degustación de vinos<br>
+        DJ Set · Wine Experience
+      </div>
+      <a class="modal-btn" id="modalPayBtn" href="#" target="_blank">Ir al pago</a>
+      <button class="modal-close" onclick="closeModal()">Volver</button>
+    </div>
+  </div>
+
+  <script>
+    function showModal(type, price, url) {
+      document.getElementById('modalTicketType').textContent = 'Entrada ' + type + ' — ' + price;
+      document.getElementById('modalPayBtn').href = url;
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
 
 </body>
 </html>
