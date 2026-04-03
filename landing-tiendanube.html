@@ -1,0 +1,551 @@
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  INSTRUCCIONES PARA TIENDA NUBE                         ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║                                                          ║
+  ║  PASO 1 — Subir imágenes:                               ║
+  ║  • Ve a Tienda Online > Diseño > Editar código           ║
+  ║  • En la carpeta /assets sube:                           ║
+  ║    - La imagen de fondo (el .png del viñedo)             ║
+  ║    - logos/moschini.svg                                  ║
+  ║    - logos/dellanzo.svg                                  ║
+  ║    - logos/chocolates.svg                                ║
+  ║    - logos/oria.svg                                      ║
+  ║  • Anota las URLs que Tienda Nube genera para cada una   ║
+  ║                                                          ║
+  ║  PASO 2 — Reemplazar URLs en el código de abajo:        ║
+  ║  • Busca "TU_URL_IMAGEN_FONDO" y ponla URL del .png     ║
+  ║  • Busca "TU_URL_LOGO_MOSCHINI" etc. y pon cada URL     ║
+  ║                                                          ║
+  ║  PASO 3 — Crear la página:                              ║
+  ║  • Ve a Tienda Online > Páginas > Crear página           ║
+  ║  • Ponle título (ej: "Evento Éter")                     ║
+  ║  • Cambiá al editor HTML (icono </>)                     ║
+  ║  • Pegá TODO el código de abajo (desde <style> hasta     ║
+  ║    el último </div>)                                     ║
+  ║  • Guardá y publicá                                      ║
+  ║                                                          ║
+  ║  PASO 4 (opcional) — Ocultar header/footer de la tienda:║
+  ║  • Si querés que se vea solo la landing sin menú,        ║
+  ║    agregá en CSS personalizado:                          ║
+  ║    .page-titulo-de-tu-pagina header,                     ║
+  ║    .page-titulo-de-tu-pagina .js-head-main,              ║
+  ║    .page-titulo-de-tu-pagina .js-footer { display:none } ║
+  ║                                                          ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+
+<!-- ═══ COPIAR DESDE AQUÍ ═══ -->
+
+<style>
+  /* Google Fonts via @import (funciona dentro de <style>) */
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Raleway:wght@200;300;400;600&display=swap');
+
+  /* ── RESET: aislar del resto de la tienda ── */
+  #pcl {
+    all: initial;
+    display: block;
+    box-sizing: border-box;
+    font-family: 'Cormorant Garamond', serif;
+    color: #f5efe6;
+    background: #1a0f0f;
+    overflow-x: hidden;
+    line-height: normal;
+    -webkit-text-size-adjust: 100%;
+    /* Tienda Nube a veces limita el ancho del contenido */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    position: relative;
+  }
+
+  #pcl *, #pcl *::before, #pcl *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Variables como propiedades directas (por compatibilidad) */
+  #pcl { --burgundy: #6b1a1a; --gold: #c9a84c; --cream: #f5efe6; --dark: #1a0f0f; }
+
+  /* ── HERO ── */
+  #pcl .pcl-hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem 4rem;
+    background:
+      linear-gradient(to bottom,
+        rgba(26,15,15,0.6) 0%,
+        rgba(26,15,15,0.35) 25%,
+        rgba(26,15,15,0.45) 50%,
+        rgba(26,15,15,0.85) 78%,
+        rgba(26,15,15,1) 100%),
+      url('TU_URL_IMAGEN_FONDO') center 30%/cover no-repeat;
+  }
+
+  #pcl .pcl-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(160deg, #3b1c0c 0%, #6b3a1f 40%, #1a0f0f 100%);
+    z-index: -1;
+  }
+
+  #pcl .pcl-badge {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: #c9a84c;
+    border: 1px solid #c9a84c;
+    padding: 0.35rem 1.2rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+    display: inline-block;
+  }
+
+  #pcl .pcl-hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.8rem, 9vw, 6.5rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    color: #f5efe6;
+    text-shadow: 0 2px 60px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    text-transform: none;
+  }
+
+  #pcl .pcl-hero h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1rem, 3.5vw, 1.7rem);
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    color: #c9a84c;
+    margin-top: 0.3rem;
+    border: none;
+    background: none;
+    padding: 0;
+    text-transform: none;
+  }
+
+  #pcl .pcl-sub {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    color: rgba(245,239,230,0.8);
+    margin-top: 0.4rem;
+    letter-spacing: 0.05em;
+  }
+
+  #pcl .pcl-divider {
+    width: 80px;
+    height: 1px;
+    background: #c9a84c;
+    margin: 1.5rem auto;
+    position: relative;
+    border: none;
+  }
+  #pcl .pcl-divider::before {
+    content: '✦';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    color: #c9a84c;
+    font-size: 0.8rem;
+    padding: 0 6px;
+  }
+
+  #pcl .pcl-event-info {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 5vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #f5efe6;
+  }
+
+  #pcl .pcl-event-info .pcl-dot { color: #c9a84c; margin: 0 0.4em; }
+
+  #pcl .pcl-event-location {
+    font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+    color: rgba(245,239,230,0.75);
+    letter-spacing: 0.12em;
+    margin-top: 0.4rem;
+  }
+
+  /* ── CTA Hero ── */
+  #pcl .pcl-hero-cta {
+    margin-top: 1.8rem;
+  }
+
+  #pcl .pcl-btn-hero {
+    display: inline-block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 1.1rem 3.5rem;
+    background: #c9a84c;
+    color: #1a0f0f;
+    border: 2px solid #c9a84c;
+    border-radius: 0;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    cursor: pointer;
+  }
+  #pcl .pcl-btn-hero:hover {
+    background: transparent;
+    color: #c9a84c;
+    transform: translateY(-2px);
+  }
+
+  /* ── SECTIONS ── */
+  #pcl .pcl-section {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+    text-align: center;
+  }
+
+  #pcl .pcl-section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    letter-spacing: 0.3em;
+    color: #c9a84c;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── TICKETS ── */
+  #pcl .pcl-tickets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+  }
+
+  @media (max-width: 520px) {
+    #pcl .pcl-tickets-grid { grid-template-columns: 1fr; }
+  }
+
+  #pcl .pcl-ticket-card {
+    border: 1px solid rgba(201,168,76,0.35);
+    padding: 2rem 1.5rem;
+    position: relative;
+    background: rgba(255,255,255,0.03);
+    backdrop-filter: blur(6px);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  #pcl .pcl-ticket-card:hover {
+    border-color: #c9a84c;
+    transform: translateY(-4px);
+  }
+
+  #pcl .pcl-ticket-card.pcl-vip {
+    border-color: rgba(201,168,76,0.6);
+    background: rgba(201,168,76,0.06);
+  }
+  #pcl .pcl-ticket-card.pcl-vip::before {
+    content: 'VIP';
+    position: absolute;
+    top: -1px; right: 1.2rem;
+    background: #c9a84c;
+    color: #1a0f0f;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    padding: 0.2rem 0.7rem;
+  }
+
+  #pcl .pcl-ticket-type {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: #c9a84c;
+    margin-bottom: 0.8rem;
+  }
+
+  #pcl .pcl-ticket-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    font-weight: 600;
+    color: #f5efe6;
+    line-height: 1;
+  }
+
+  #pcl .pcl-ticket-price span {
+    font-size: 0.5em;
+    vertical-align: super;
+    color: #c9a84c;
+  }
+
+  #pcl .pcl-ticket-perks {
+    font-size: 0.9rem;
+    color: rgba(245,239,230,0.65);
+    font-style: italic;
+    margin: 0.7rem 0 1.5rem;
+    line-height: 1.5;
+  }
+
+  #pcl .pcl-btn {
+    display: inline-block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.85rem 2rem;
+    border: 1px solid #c9a84c;
+    color: #c9a84c;
+    background: transparent;
+    border-radius: 0;
+    transition: background 0.3s, color 0.3s;
+    cursor: pointer;
+    width: 100%;
+  }
+  #pcl .pcl-btn:hover {
+    background: #c9a84c;
+    color: #1a0f0f;
+  }
+  #pcl .pcl-btn-filled {
+    background: #c9a84c;
+    color: #1a0f0f;
+  }
+  #pcl .pcl-btn-filled:hover {
+    background: #b8932e;
+    border-color: #b8932e;
+    color: #1a0f0f;
+  }
+
+  /* ── EXPERIENCE ── */
+  #pcl .pcl-exp-list {
+    list-style: none;
+    margin-top: 2rem;
+    text-align: left;
+    display: inline-block;
+    padding: 0;
+  }
+  #pcl .pcl-exp-list li {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 2.5vw, 1.15rem);
+    color: rgba(245,239,230,0.85);
+    padding: 0.5rem 0 0.5rem 1.8rem;
+    position: relative;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    list-style: none;
+  }
+  #pcl .pcl-exp-list li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    color: #c9a84c;
+    font-size: 0.65rem;
+    top: 0.65rem;
+  }
+  #pcl .pcl-exp-list li strong {
+    color: #f5efe6;
+    font-weight: 600;
+  }
+
+  /* ── SPONSORS ── */
+  #pcl .pcl-sponsors {
+    padding: 3rem 1.5rem 4rem;
+    text-align: center;
+    border-top: 1px solid rgba(201,168,76,0.15);
+  }
+
+  #pcl .pcl-sponsors-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,239,230,0.5);
+    margin-bottom: 2rem;
+  }
+
+  #pcl .pcl-sponsors-logos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem 3rem;
+  }
+
+  #pcl .pcl-sponsor-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.55;
+    transition: opacity 0.3s;
+    flex-shrink: 0;
+  }
+  #pcl .pcl-sponsor-logo:hover { opacity: 1; }
+
+  #pcl .pcl-sponsor-logo svg,
+  #pcl .pcl-sponsor-logo img {
+    height: 45px;
+    width: auto;
+    max-width: 150px;
+  }
+
+  @media (max-width: 600px) {
+    #pcl .pcl-sponsors-logos { gap: 1.5rem 2rem; }
+    #pcl .pcl-sponsor-logo svg,
+    #pcl .pcl-sponsor-logo img { height: 36px; }
+  }
+
+  /* ── FOOTER ── */
+  #pcl .pcl-footer {
+    padding: 2rem;
+    text-align: center;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,239,230,0.25);
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes pclFadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #pcl .pcl-fade-up { animation: pclFadeUp 1s ease both; }
+  #pcl .pcl-d1 { animation-delay: 0.15s; }
+  #pcl .pcl-d2 { animation-delay: 0.3s; }
+  #pcl .pcl-d3 { animation-delay: 0.5s; }
+  #pcl .pcl-d4 { animation-delay: 0.7s; }
+  #pcl .pcl-d5 { animation-delay: 0.9s; }
+</style>
+
+<div id="pcl">
+
+  <!-- ══ HERO ══ -->
+  <div class="pcl-hero">
+    <p class="pcl-badge pcl-fade-up">Evento exclusivo · Buenos Aires</p>
+    <h1 class="pcl-fade-up pcl-d1">PAZ CORNÚ</h1>
+    <h2 class="pcl-fade-up pcl-d2">Colección Éter</h2>
+    <p class="pcl-sub pcl-fade-up pcl-d2">Nueva cápsula hombre</p>
+
+    <div class="pcl-divider pcl-fade-up pcl-d3"></div>
+
+    <p class="pcl-event-info pcl-fade-up pcl-d3">
+      10 Abril <span class="pcl-dot">✦</span> 19:00 Hrs
+    </p>
+    <p class="pcl-event-location pcl-fade-up pcl-d4">Fitz Roy 1829</p>
+
+    <div class="pcl-hero-cta pcl-fade-up pcl-d4">
+      <a href="#pcl-tickets" class="pcl-btn-hero">Comprar Entradas</a>
+    </div>
+  </div>
+
+  <!-- ══ TICKETS ══ -->
+  <div class="pcl-section" id="pcl-tickets">
+    <p class="pcl-section-title">Tickets</p>
+    <div class="pcl-divider"></div>
+
+    <div class="pcl-tickets-grid">
+
+      <!-- GENERAL -->
+      <div class="pcl-ticket-card">
+        <p class="pcl-ticket-type">General</p>
+        <p class="pcl-ticket-price"><span>$</span>70.000</p>
+        <p class="pcl-ticket-perks">
+          Acceso al desfile<br>
+          Degustación de vinos y sabores<br>
+          DJ Set: Maik Costa
+        </p>
+        <!-- 🔗 Reemplazá LINK_PAGO_GENERAL con el link de pago -->
+        <a href="LINK_PAGO_GENERAL" target="_blank" class="pcl-btn">Comprar General</a>
+      </div>
+
+      <!-- VIP -->
+      <div class="pcl-ticket-card pcl-vip">
+        <p class="pcl-ticket-type">VIP</p>
+        <p class="pcl-ticket-price"><span>$</span>100.000</p>
+        <p class="pcl-ticket-perks">
+          Todo lo de General +<br>
+          <strong>Acceso cabina de fotos</strong><br>
+          &nbsp;
+        </p>
+        <!-- 🔗 Reemplazá LINK_PAGO_VIP con el link de pago -->
+        <a href="LINK_PAGO_VIP" target="_blank" class="pcl-btn pcl-btn-filled">Comprar VIP</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ EXPERIENCIA ══ -->
+  <div class="pcl-section" style="padding-top:0;">
+    <p class="pcl-section-title">Qué incluye la experiencia</p>
+    <div class="pcl-divider"></div>
+
+    <ul class="pcl-exp-list">
+      <li>Degustación de vinos de <strong>Baires Wines, Perpetuo Wines y Bodega Moschini</strong></li>
+      <li>Sabores seleccionados de <strong>Cocoabit Chocolates y Familia Dellanzo</strong></li>
+      <li>DJ Set de <strong>Maik Costa</strong></li>
+    </ul>
+  </div>
+
+  <!-- ══ SPONSORS ══ -->
+  <div class="pcl-sponsors">
+    <p class="pcl-sponsors-label">Bodegas patrocinadoras</p>
+    <div class="pcl-sponsors-logos">
+
+      <!-- Bodega & Viñedos Moschini -->
+      <div class="pcl-sponsor-logo">
+        <img src="TU_URL_LOGO_MOSCHINI" alt="Bodega & Viñedos Moschini">
+      </div>
+
+      <!-- Bodega Familia Dellanzo -->
+      <div class="pcl-sponsor-logo">
+        <img src="TU_URL_LOGO_DELLANZO" alt="Bodega Familia Dellanzo">
+      </div>
+
+      <!-- Cocoabit Chocolates -->
+      <div class="pcl-sponsor-logo">
+        <img src="TU_URL_LOGO_CHOCOLATES" alt="Cocoabit Chocolates">
+      </div>
+
+      <!-- D.V. Catena -->
+      <div class="pcl-sponsor-logo">
+        <svg viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="8" width="130" height="34" stroke="#f5efe6" stroke-width="0.7" fill="none"/>
+          <text x="70" y="31" text-anchor="middle" font-family="'Cinzel', serif" font-size="14" font-weight="400" letter-spacing="3" fill="#f5efe6">D.V. Catena</text>
+        </svg>
+      </div>
+
+      <!-- Oria -->
+      <div class="pcl-sponsor-logo">
+        <img src="TU_URL_LOGO_ORIA" alt="Oria">
+      </div>
+
+      <!-- Perpetuo -->
+      <div class="pcl-sponsor-logo">
+        <svg viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <text x="70" y="28" text-anchor="middle" font-family="'Cinzel', serif" font-size="13" font-weight="400" letter-spacing="4" fill="#f5efe6">PERPETUO</text>
+          <text x="70" y="40" text-anchor="middle" font-family="'Raleway', sans-serif" font-size="5.5" font-style="italic" letter-spacing="1" fill="#f5efe6">by Brava</text>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="pcl-footer">© 2026 Paz Cornú · Colección Éter · Todos los derechos reservados</div>
+
+</div>
+
+<!-- ═══ COPIAR HASTA AQUÍ ═══ -->

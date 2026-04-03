@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+
+# Carpetas pesadas de fotos (no van al repo)
+Fotos wetransfer/
+Imágenes Campaña/
+
+# Reporte (tiene su propio repo)
+Reporte Paz/
