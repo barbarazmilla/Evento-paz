@@ -282,79 +282,35 @@
       color: var(--dark);
     }
 
-    /* ── EXPERIENCE ── */
-    .experience-list {
-      list-style: none;
-      margin-top: 2rem;
-      text-align: left;
-      display: inline-block;
-    }
-    .experience-list li {
-      font-size: clamp(1rem, 2.5vw, 1.15rem);
-      color: rgba(245,239,230,0.85);
-      padding: 0.5rem 0;
-      padding-left: 1.8rem;
-      position: relative;
-      line-height: 1.5;
-      border-bottom: 1px solid rgba(201,168,76,0.12);
-    }
-    .experience-list li::before {
-      content: '✦';
-      position: absolute;
-      left: 0;
-      color: var(--gold);
-      font-size: 0.65rem;
-      top: 0.65rem;
-    }
-    .experience-list li strong {
-      color: var(--cream);
-      font-weight: 600;
-    }
-
-    /* ── SPONSORS ── */
-    .sponsors {
-      padding: 3rem 1.5rem 4rem;
+    /* ── CLOSING ── */
+    .closing {
+      padding: 5rem 2rem 3rem;
       text-align: center;
-      border-top: 1px solid rgba(201,168,76,0.15);
+      border-top: 1px solid rgba(201,168,76,0.12);
     }
 
-    .sponsors-label {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 0.95rem;
+    .closing-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 400;
       letter-spacing: 0.15em;
-      color: rgba(245,239,230,0.5);
-      margin-bottom: 2rem;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
     }
 
-    .sponsors-logos {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem 3rem;
+    .closing-text {
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(245,239,230,0.6);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      max-width: 500px;
+      margin: 0 auto;
     }
 
-    .sponsor-logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.55;
-      transition: opacity 0.3s;
-      flex-shrink: 0;
-    }
-    .sponsor-logo:hover { opacity: 1; }
-
-    .sponsor-logo svg,
-    .sponsor-logo img {
-      height: 45px;
-      width: auto;
-    }
-
-    @media (max-width: 600px) {
-      .sponsors-logos { gap: 1.5rem 2rem; }
-      .sponsor-logo svg,
-      .sponsor-logo img { height: 36px; }
+    .closing .divider {
+      margin: 2rem auto;
     }
 
     /* ── FOOTER ── */
@@ -438,60 +394,11 @@
     </div>
   </section>
 
-  <!-- ══ EXPERIENCIA ══ -->
-  <section class="section" style="padding-top:0;">
-    <p class="section-title">Qué incluye la experiencia</p>
+  <!-- ══ CIERRE ══ -->
+  <section class="closing">
+    <p class="closing-title">Wine Experience by Paz Cornú</p>
+    <p class="closing-text">Los mejores vinos, moda en vivo y una experiencia que no se repite.</p>
     <div class="divider"></div>
-
-    <ul class="experience-list">
-      <li>Degustación de vinos de <strong>Baires Wines, Perpetuo Wines y Bodega Moschini</strong></li>
-      <li>Sabores seleccionados de <strong>Cocoabit Chocolates y Familia Dellanzo</strong></li>
-      <li>DJ Set de <strong>Maik Costa</strong></li>
-    </ul>
-  </section>
-
-  <!-- ══ SPONSORS ══ -->
-  <section class="sponsors">
-    <p class="sponsors-label">Bodegas patrocinadoras</p>
-    <div class="sponsors-logos">
-
-      <!-- Bodega & Viñedos Moschini -->
-      <div class="sponsor-logo">
-        <img src="assets/logos/moschini.svg" alt="Bodega & Viñedos Moschini">
-      </div>
-
-      <!-- Bodega Familia Dellanzo -->
-      <div class="sponsor-logo">
-        <img src="assets/logos/dellanzo.svg" alt="Bodega Familia Dellanzo">
-      </div>
-
-      <!-- Cocoabit Chocolates -->
-      <div class="sponsor-logo">
-        <img src="assets/logos/chocolates.svg" alt="Cocoabit Chocolates">
-      </div>
-
-      <!-- D.V. Catena -->
-      <div class="sponsor-logo">
-        <svg viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="8" width="130" height="34" stroke="#f5efe6" stroke-width="0.7" fill="none"/>
-          <text x="70" y="31" text-anchor="middle" font-family="'Cinzel', serif" font-size="14" font-weight="400" letter-spacing="3" fill="#f5efe6">D.V. Catena</text>
-        </svg>
-      </div>
-
-      <!-- Oria -->
-      <div class="sponsor-logo">
-        <img src="assets/logos/oria.svg" alt="Oria">
-      </div>
-
-      <!-- Perpetuo -->
-      <div class="sponsor-logo">
-        <svg viewBox="0 0 140 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <text x="70" y="28" text-anchor="middle" font-family="'Cinzel', serif" font-size="13" font-weight="400" letter-spacing="4" fill="#f5efe6">PERPETUO</text>
-          <text x="70" y="40" text-anchor="middle" font-family="'Raleway', sans-serif" font-size="5.5" font-style="italic" letter-spacing="1" fill="#f5efe6">by Brava</text>
-        </svg>
-      </div>
-
-    </div>
   </section>
 
   <footer>© 2026 Paz Cornú · Colección Éter · Todos los derechos reservados</footer>
