@@ -803,34 +803,35 @@
         Desfile Colección Éter · Degustación de vinos<br>
         DJ Set · Wine Experience
       </div>
-      <a class="modal-btn" id="modalPayBtn" href="#" target="_blank">Ir al pago</a>
+      <a class="modal-btn" id="modalPayBtn" href="#" onclick="openForm(); return false;">Continuar</a>
       <button class="modal-close" onclick="closeModal()">Volver</button>
     </div>
   </div>
 
-  <!-- ══ POPUP FORMULARIO POST-PAGO ══ -->
+  <!-- ══ POPUP FORMULARIO PRE-PAGO ══ -->
   <div class="form-overlay" id="formOverlay">
     <div class="form-modal">
-      <h3>¡Gracias por tu compra!</h3>
-      <p class="form-sub">Dejá tus datos para recibir toda la info del evento</p>
+      <h3>Completá tus datos</h3>
+      <p class="form-sub">Para recibir tu entrada y toda la info del evento</p>
       <form id="postPayForm">
         <input type="text" name="nombre" placeholder="Nombre completo" required />
         <input type="email" name="email" placeholder="Email" required />
         <input type="tel" name="telefono" placeholder="Teléfono / WhatsApp" />
-        <button type="submit" class="form-submit" id="formSubmitBtn">Confirmar asistencia</button>
+        <button type="submit" class="form-submit" id="formSubmitBtn">Ir al pago</button>
       </form>
       <div class="form-success" id="formSuccess">
-        ✨ ¡Listo! Te esperamos el 26 de abril.<br>
-        Revisá tu email para más detalles.
+        ✨ ¡Datos guardados! Redirigiendo al pago...
       </div>
-      <button class="form-skip" id="formSkipBtn" onclick="closeFormOverlay()">Omitir</button>
+      <button class="form-skip" id="formSkipBtn" onclick="skipForm()">Omitir y pagar directo</button>
     </div>
   </div>
 
   <script>
+    var currentPayUrl = '';
+
     function showModal(type, price, url) {
+      currentPayUrl = url;
       document.getElementById('modalTicketType').textContent = 'Entrada ' + type + ' — ' + price;
-      document.getElementById('modalPayBtn').href = url;
       document.getElementById('modalOverlay').classList.add('active');
     }
     function closeModal() {
@@ -840,23 +841,23 @@
       if (e.target === this) closeModal();
     });
 
-    /* ── Post-pago: detectar retorno ── */
+    /* ── Formulario pre-pago ── */
+    function openForm() {
+      closeModal();
+      document.getElementById('formOverlay').classList.add('active');
+    }
     function closeFormOverlay() {
       document.getElementById('formOverlay').classList.remove('active');
-      // Limpiar URL
-      if (window.history.replaceState) {
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
     }
+    function skipForm() {
+      closeFormOverlay();
+      window.open(currentPayUrl, '_blank');
+    }
+    document.getElementById('formOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeFormOverlay();
+    });
 
-    (function() {
-      var params = new URLSearchParams(window.location.search);
-      if (params.has('pago') || params.has('collection_status') || params.has('payment_id')) {
-        document.getElementById('formOverlay').classList.add('active');
-      }
-    })();
-
-    /* ── Enviar formulario a Google Sheets ── */
+    /* ── Enviar formulario a Google Sheets y redirigir al pago ── */
     document.getElementById('postPayForm').addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = document.getElementById('formSubmitBtn');
@@ -864,31 +865,30 @@
       btn.textContent = 'Enviando...';
 
       var data = new FormData(this);
-      var params = new URLSearchParams(window.location.search);
-      data.append('tipo_entrada', params.get('payment_id') ? 'Mercado Pago' : 'Web');
+      data.append('tipo_entrada', document.getElementById('modalTicketType').textContent);
+      data.append('fecha', new Date().toLocaleString('es-AR'));
 
-      // Enviar a Google Sheets (reemplazar URL con tu Apps Script)
       var SHEET_URL = 'GOOGLE_APPS_SCRIPT_URL';
 
       if (SHEET_URL === 'GOOGLE_APPS_SCRIPT_URL') {
-        // Demo mode: mostrar éxito sin enviar
-        showFormSuccess();
+        // Demo: redirigir directo
+        showSuccessAndPay();
         return;
       }
 
-      fetch(SHEET_URL, {
-        method: 'POST',
-        body: data
-      })
-      .then(function() { showFormSuccess(); })
-      .catch(function() { showFormSuccess(); });
+      fetch(SHEET_URL, { method: 'POST', body: data })
+        .then(function() { showSuccessAndPay(); })
+        .catch(function() { showSuccessAndPay(); });
     });
 
-    function showFormSuccess() {
+    function showSuccessAndPay() {
       document.getElementById('postPayForm').style.display = 'none';
       document.getElementById('formSuccess').style.display = 'block';
-      document.getElementById('formSkipBtn').textContent = 'Cerrar';
-      setTimeout(closeFormOverlay, 4000);
+      document.getElementById('formSkipBtn').style.display = 'none';
+      setTimeout(function() {
+        closeFormOverlay();
+        window.open(currentPayUrl, '_blank');
+      }, 1500);
     }
   </script>
 
