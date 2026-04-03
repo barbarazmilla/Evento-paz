@@ -171,10 +171,12 @@
     }
 
     .section-title {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(1.4rem, 4vw, 2rem);
-      letter-spacing: 0.3em;
-      color: var(--gold);
+      font-family: 'Raleway', sans-serif;
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      font-weight: 400;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.6);
       margin-bottom: 0.5rem;
     }
 
@@ -190,22 +192,22 @@
     }
 
     .ticket-card {
-      border: 1px solid rgba(201,168,76,0.2);
-      padding: 2.2rem 1.8rem;
+      border: 1px solid rgba(201,168,76,0.12);
+      padding: 2.4rem 1.8rem;
       position: relative;
-      background: linear-gradient(165deg, rgba(40,22,22,0.6) 0%, rgba(26,15,15,0.9) 100%);
-      backdrop-filter: blur(8px);
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+      background: linear-gradient(170deg, rgba(30,18,16,0.85) 0%, rgba(18,10,8,0.95) 100%);
+      backdrop-filter: blur(10px);
+      transition: border-color 0.4s, transform 0.3s, box-shadow 0.4s;
     }
     .ticket-card:hover {
-      border-color: rgba(201,168,76,0.6);
-      transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      border-color: rgba(201,168,76,0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,168,76,0.08);
     }
 
     .ticket-card.vip {
-      border-color: rgba(201,168,76,0.45);
-      background: linear-gradient(165deg, rgba(50,28,18,0.7) 0%, rgba(30,16,12,0.95) 100%);
+      border-color: rgba(201,168,76,0.25);
+      background: linear-gradient(170deg, rgba(35,20,14,0.9) 0%, rgba(22,12,10,0.98) 100%);
     }
     .ticket-card.vip::before {
       content: 'VIP';
@@ -222,11 +224,11 @@
 
     .ticket-type {
       font-family: 'Raleway', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.25em;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.35em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: rgba(201,168,76,0.7);
       margin-bottom: 0.8rem;
     }
 
@@ -259,25 +261,27 @@
     .btn {
       display: inline-block;
       font-family: 'Raleway', sans-serif;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.25em;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       text-decoration: none;
-      padding: 0.85rem 2rem;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      transition: background 0.3s, color 0.3s;
+      padding: 0.9rem 2rem;
+      border: 1px solid rgba(201,168,76,0.4);
+      color: rgba(201,168,76,0.85);
+      transition: all 0.35s ease;
       cursor: pointer;
       width: 100%;
     }
     .btn:hover {
-      background: var(--gold);
-      color: var(--dark);
+      background: rgba(201,168,76,0.12);
+      border-color: rgba(201,168,76,0.7);
+      color: var(--gold);
     }
     .btn-filled {
       background: var(--gold);
       color: var(--dark);
+      border-color: var(--gold);
     }
     .btn-filled:hover {
       background: #b8932e;
