@@ -918,7 +918,9 @@
 
       var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyaE0npm7Y2oE54XKU3AU_yw8-CC4LwDf3ws4syNuJag1xV5LVrfiTLYvmSbxA-xkYX/exec';
 
-
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead');
+      }
 
       fetch(SHEET_URL, { method: 'POST', body: data })
         .then(function() { showSuccessAndPay(); })
