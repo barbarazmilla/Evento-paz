@@ -868,13 +868,9 @@
       data.append('tipo_entrada', document.getElementById('modalTicketType').textContent);
       data.append('fecha', new Date().toLocaleString('es-AR'));
 
-      var SHEET_URL = 'GOOGLE_APPS_SCRIPT_URL';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyaE0npm7Y2oE54XKU3AU_yw8-CC4LwDf3ws4syNuJag1xV5LVrfiTLYvmSbxA-xkYX/exec';
 
-      if (SHEET_URL === 'GOOGLE_APPS_SCRIPT_URL') {
-        // Demo: redirigir directo
-        showSuccessAndPay();
-        return;
-      }
+
 
       fetch(SHEET_URL, { method: 'POST', body: data })
         .then(function() { showSuccessAndPay(); })
