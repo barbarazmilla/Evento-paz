@@ -206,20 +206,11 @@
     }
 
     .ticket-card.vip {
-      border-color: rgba(201,168,76,0.25);
-      background: linear-gradient(170deg, rgba(35,20,14,0.9) 0%, rgba(22,12,10,0.98) 100%);
+      border-color: rgba(201,168,76,0.12);
     }
     .ticket-card.vip::before {
-      content: 'VIP';
-      position: absolute;
-      top: -1px; right: 1.2rem;
-      background: var(--gold);
-      color: var(--dark);
-      font-family: 'Raleway', sans-serif;
-      font-size: 0.62rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      padding: 0.2rem 0.7rem;
+      content: '';
+      display: none;
     }
 
     .ticket-type {
