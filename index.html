@@ -916,7 +916,7 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbw6_ImjER2LxTGJUeSPSaRsFJ_3QTE_d1FS9cYi4tOoJmzp9A3-X11rfoqSw4O_9tst/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbz7OgkMyxNYo2nucGV_vRxrQ72HN74emB3qgrt3skS72avrUR5zY3WCYxUmOi8g_bQe/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
@@ -937,10 +937,7 @@
             return;
           }
           console.log('JSON parseado:', json);
-          if (json && json.sandbox_init_point) {
-            currentPayUrl = json.sandbox_init_point;
-            console.log('Usando sandbox_init_point:', currentPayUrl);
-          } else if (json && json.init_point) {
+          if (json && json.init_point) {
             currentPayUrl = json.init_point;
             console.log('Usando init_point:', currentPayUrl);
           } else {
