@@ -916,7 +916,7 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxrI7vsvOIjI6hdmB6roE2LUa1bMx3hb-iaMhnZEYZBBKylax_k9ZMcTfxcxLdfe_n9/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
@@ -953,7 +953,7 @@
       var paymentId = params.get('payment_id') || params.get('collection_id');
 
       if (status && externalRef) {
-        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxrI7vsvOIjI6hdmB6roE2LUa1bMx3hb-iaMhnZEYZBBKylax_k9ZMcTfxcxLdfe_n9/exec';
+        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
         var updateData = new FormData();
         updateData.append('action', 'update_status');
         updateData.append('external_reference', externalRef);
