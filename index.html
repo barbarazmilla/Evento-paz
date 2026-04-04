@@ -923,16 +923,33 @@
       }
 
       fetch(SHEET_URL, { method: 'POST', body: data })
-        .then(function(response) { return response.json(); })
-        .then(function(json) {
+        .then(function(response) {
+          console.log('Response status:', response.status);
+          console.log('Response URL:', response.url);
+          return response.text();
+        })
+        .then(function(text) {
+          console.log('Response body:', text);
+          var json;
+          try { json = JSON.parse(text); } catch(e) {
+            console.error('No es JSON válido:', e);
+            showSuccessAndPay();
+            return;
+          }
+          console.log('JSON parseado:', json);
           if (json && json.sandbox_init_point) {
             currentPayUrl = json.sandbox_init_point;
+            console.log('Usando sandbox_init_point:', currentPayUrl);
           } else if (json && json.init_point) {
             currentPayUrl = json.init_point;
+            console.log('Usando init_point:', currentPayUrl);
+          } else {
+            console.warn('No se encontró init_point en la respuesta');
           }
           showSuccessAndPay();
         })
-        .catch(function() {
+        .catch(function(err) {
+          console.error('Error en fetch:', err);
           showSuccessAndPay();
         });
     });
