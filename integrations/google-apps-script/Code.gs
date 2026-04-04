@@ -66,7 +66,6 @@ function createLead_(payload) {
   var leadId = buildId_('lead');
   var externalReference = buildId_('ext');
   var expectedAmount = resolveExpectedAmount_(tipoEntrada);
-  var checkoutUrl = resolveCheckoutUrl_(tipoEntrada);
   var now = new Date().toISOString();
 
   var row = {
@@ -90,11 +89,14 @@ function createLead_(payload) {
 
   appendRow_(row);
 
+  var preference = createMercadoPagoPreference_(row);
+
   return {
     ok: true,
     lead_id: leadId,
     external_reference: externalReference,
-    init_point: checkoutUrl || null
+    preference_id: preference.preference_id,
+    init_point: preference.init_point
   };
 }
 
@@ -226,27 +228,102 @@ function mapRowToHeaders_(rowObject) {
   });
 }
 
-function resolveExpectedAmount_(tipoEntrada) {
-  var normalized = tipoEntrada.toLowerCase();
-  if (normalized.indexOf('vip') !== -1) {
-    return '100000';
+function createMercadoPagoPreference_(row) {
+  var ticketDetails = resolveTicketDetails_(row.tipo_entrada);
+  var body = {
+    items: [{
+      id: row.lead_id,
+      title: ticketDetails.title,
+      description: ticketDetails.description,
+      quantity: 1,
+      currency_id: 'ARS',
+      unit_price: ticketDetails.unit_price
+    }],
+    payer: {
+      name: row.nombre,
+      email: row.email
+    },
+    external_reference: row.external_reference,
+    notification_url: getRequiredProperty_('MP_NOTIFICATION_URL'),
+    metadata: {
+      lead_id: row.lead_id,
+      source: row.source,
+      tipo_entrada: row.tipo_entrada
+    }
+  };
+  var returnUrl = PropertiesService.getScriptProperties().getProperty('MP_RETURN_URL');
+
+  if (row.telefono) {
+    body.payer.phone = {
+      number: row.telefono
+    };
   }
-  if (normalized.indexOf('general') !== -1) {
-    return '70000';
+
+  if (returnUrl) {
+    body.back_urls = {
+      success: returnUrl,
+      pending: returnUrl,
+      failure: returnUrl
+    };
+    body.auto_return = 'approved';
   }
-  return '';
+
+  return postMercadoPagoPreference_(body);
 }
 
-function resolveCheckoutUrl_(tipoEntrada) {
-  var properties = PropertiesService.getScriptProperties();
-  var normalized = tipoEntrada.toLowerCase();
+function postMercadoPagoPreference_(body) {
+  var accessToken = getRequiredProperty_('MP_ACCESS_TOKEN');
+  var response = UrlFetchApp.fetch('https://api.mercadopago.com/checkout/preferences', {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + accessToken
+    },
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true
+  });
+  var statusCode = response.getResponseCode();
+  var responseText = response.getContentText();
+  var parsed = parseJson_(responseText);
+
+  if (statusCode < 200 || statusCode >= 300) {
+    throw new Error('mercadopago_preference_error_' + statusCode + ': ' + responseText);
+  }
+
+  if (!parsed.id || !parsed.init_point) {
+    throw new Error('mercadopago_preference_invalid_response');
+  }
+
+  return {
+    preference_id: String(parsed.id),
+    init_point: String(parsed.init_point)
+  };
+}
+
+function resolveTicketDetails_(tipoEntrada) {
+  var normalized = String(tipoEntrada || '').toLowerCase();
+
   if (normalized.indexOf('vip') !== -1) {
-    return properties.getProperty('PAY_URL_VIP') || '';
+    return {
+      title: 'Entrada VIP - Wine Experience by Paz Cornu',
+      description: 'Acceso VIP para Wine Experience by Paz Cornu',
+      unit_price: 100000
+    };
   }
+
   if (normalized.indexOf('general') !== -1) {
-    return properties.getProperty('PAY_URL_GENERAL') || '';
+    return {
+      title: 'Entrada General - Wine Experience by Paz Cornu',
+      description: 'Acceso general para Wine Experience by Paz Cornu',
+      unit_price: 70000
+    };
   }
-  return '';
+
+  throw new Error('unsupported_ticket_type');
+}
+
+function resolveExpectedAmount_(tipoEntrada) {
+  return String(resolveTicketDetails_(tipoEntrada).unit_price);
 }
 
 function getPayload_(e) {
@@ -309,6 +386,14 @@ function normalizeAction_(value) {
 
 function buildId_(prefix) {
   return prefix + '_' + Utilities.getUuid().replace(/-/g, '').slice(0, 20);
+}
+
+function parseJson_(value) {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return {};
+  }
 }
 
 function jsonOutput(payload) {

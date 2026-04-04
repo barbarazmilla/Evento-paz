@@ -6,7 +6,8 @@ Base para usar Google Sheets como almacenamiento de leads sin permitir que el fr
 
 - acepta `create_lead` como accion publica,
 - guarda el lead con `lead_id` y `external_reference`,
-- devuelve `init_point` opcional segun el ticket,
+- crea una preferencia dinamica de Mercado Pago por lead,
+- devuelve `init_point` y `preference_id`,
 - acepta `update_payment` solo si recibe un secreto compartido,
 - actualiza el estado del pago en la misma fila del lead.
 
@@ -15,8 +16,9 @@ Base para usar Google Sheets como almacenamiento de leads sin permitir que el fr
 - `SPREADSHEET_ID`
 - `LEADS_SHEET_NAME` opcional, por defecto `Leads`
 - `WEBHOOK_SHARED_SECRET`
-- `PAY_URL_GENERAL` opcional
-- `PAY_URL_VIP` opcional
+- `MP_ACCESS_TOKEN`
+- `MP_NOTIFICATION_URL`
+- `MP_RETURN_URL` opcional
 
 ## Despliegue
 
@@ -38,6 +40,13 @@ El frontend puede seguir enviando `FormData` con estos campos:
 - `source` opcional
 
 Si `action` no viene informado, el script asume `create_lead`.
+
+La respuesta exitosa ahora devuelve:
+
+- `lead_id`
+- `external_reference`
+- `preference_id`
+- `init_point`
 
 ## Accion privada esperada
 
@@ -86,5 +95,7 @@ curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec' \
 ```
 
 ## Nota
+
+La preferencia se crea con `external_reference` y `notification_url`, lo que permite conciliar el pago server-side desde el webhook.
 
 Esto sigue siendo una base liviana. Si el volumen sube o necesitás controles mas finos, conviene migrar la conciliacion a un backend real y dejar Apps Script solo como adaptador de Sheets.

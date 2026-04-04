@@ -925,13 +925,16 @@
       fetch(LEAD_ENDPOINT_URL, { method: 'POST', body: data })
         .then(function(response) { return response.json(); })
         .then(function(json) {
-          if (json && json.init_point) {
-            currentPayUrl = json.init_point;
+          if (!json || !json.init_point) {
+            throw new Error('missing_init_point');
           }
+          currentPayUrl = json.init_point;
           showSuccessAndPay();
         })
         .catch(function() {
-          showSuccessAndPay();
+          btn.disabled = false;
+          btn.textContent = 'Ir al pago';
+          window.alert('No pudimos iniciar el pago en este momento. Volve a intentar en unos segundos.');
         });
     });
 
