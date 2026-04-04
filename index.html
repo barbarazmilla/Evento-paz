@@ -855,6 +855,7 @@
         <input type="text" name="nombre" autocomplete="name" placeholder="Nombre completo" required />
         <input type="email" name="email" autocomplete="email" placeholder="Email" required />
         <input type="tel" name="telefono" autocomplete="tel" placeholder="Teléfono / WhatsApp" />
+        <input type="text" name="website" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
         <button type="submit" class="form-submit" id="formSubmitBtn">Ir al pago</button>
       </form>
       <div class="form-success" id="formSuccess">
@@ -866,6 +867,7 @@
 
   <script>
     var currentPayUrl = '';
+    var LEAD_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
 
     var descriptions = {
       General: 'Desfile Colección Éter · Degustación de vinos<br>DJ Set · Wine Experience',
@@ -912,17 +914,15 @@
       btn.textContent = 'Enviando...';
 
       var data = new FormData(this);
+      data.append('action', 'create_lead');
       data.append('tipo_entrada', document.getElementById('modalTicketType').textContent);
-      data.append('fecha', new Date().toLocaleString('es-AR'));
-      data.append('estado_pago', 'Pendiente');
-
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
+      data.append('source', 'landing_wine_experience_publica');
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
       }
 
-      fetch(SHEET_URL, { method: 'POST', body: data })
+      fetch(LEAD_ENDPOINT_URL, { method: 'POST', body: data })
         .then(function(response) { return response.json(); })
         .then(function(json) {
           if (json && json.init_point) {
@@ -944,28 +944,6 @@
         window.open(currentPayUrl, '_blank');
       }, 1500);
     }
-
-    /* ── Actualizar estado de pago cuando MP redirige de vuelta ── */
-    (function() {
-      var params = new URLSearchParams(window.location.search);
-      var status = params.get('status') || params.get('collection_status');
-      var externalRef = params.get('external_reference');
-      var paymentId = params.get('payment_id') || params.get('collection_id');
-
-      if (status && externalRef) {
-        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
-        var updateData = new FormData();
-        updateData.append('action', 'update_status');
-        updateData.append('external_reference', externalRef);
-        updateData.append('status', status);
-        updateData.append('payment_id', paymentId || '');
-
-        fetch(SHEET_URL, { method: 'POST', body: updateData })
-          .then(function(r) { return r.text(); })
-          .then(function(t) { console.log('Estado actualizado:', t); })
-          .catch(function(e) { console.error('Error actualizando estado:', e); });
-      }
-    })();
   </script>
 
 </body>

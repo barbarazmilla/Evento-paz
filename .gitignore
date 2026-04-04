@@ -1,5 +1,17 @@
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.crt
+*.cer
+*.mobileprovision
+.venv/
+venv/
 
 # Carpetas pesadas de fotos (no van al repo)
 Fotos wetransfer/
