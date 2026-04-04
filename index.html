@@ -916,7 +916,7 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxuHGzRgytOCA_-morXK9zkwcJoHEtCr09l20Ub9WjHKHUj4BiEBfCwfK2aQPMTfssf/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbx7JHOglFIGorRhcrOtrTTuUmTENP5-SFNj8J3L6PovT7YUUzo7-3Rg-3E4SoSMJ2j-/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
@@ -937,10 +937,7 @@
             return;
           }
           console.log('JSON parseado:', json);
-          if (json && json.sandbox_init_point) {
-            currentPayUrl = json.sandbox_init_point;
-            console.log('Usando sandbox_init_point:', currentPayUrl);
-          } else if (json && json.init_point) {
+          if (json && json.init_point) {
             currentPayUrl = json.init_point;
             console.log('Usando init_point:', currentPayUrl);
           } else {
@@ -972,7 +969,7 @@
       var paymentId = params.get('payment_id') || params.get('collection_id');
 
       if (status && externalRef) {
-        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxuHGzRgytOCA_-morXK9zkwcJoHEtCr09l20Ub9WjHKHUj4BiEBfCwfK2aQPMTfssf/exec';
+        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbx7JHOglFIGorRhcrOtrTTuUmTENP5-SFNj8J3L6PovT7YUUzo7-3Rg-3E4SoSMJ2j-/exec';
         var updateData = new FormData();
         updateData.append('action', 'update_status');
         updateData.append('external_reference', externalRef);
