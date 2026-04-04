@@ -916,7 +916,7 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxEpTIqEvNR9DekpH-sr3FyTwwa3p_jX72vSPzlPKqAdwYIE1otElJph46iutJf2TQb/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxy518XAJ4A_9Lwz2zUfai67gwUOTuGMRwu1B5Z-C3EuXb0Gi2Z1n8-bxIoEKYVpFar/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
@@ -925,7 +925,9 @@
       fetch(SHEET_URL, { method: 'POST', body: data })
         .then(function(response) { return response.json(); })
         .then(function(json) {
-          if (json && json.init_point) {
+          if (json && json.sandbox_init_point) {
+            currentPayUrl = json.sandbox_init_point;
+          } else if (json && json.init_point) {
             currentPayUrl = json.init_point;
           }
           showSuccessAndPay();
