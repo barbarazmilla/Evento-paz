@@ -35,6 +35,24 @@ No existe pipeline de build ni tests automaticos.
 6. La landing puede recibir parametros de retorno para UX.
 7. La confirmacion real del pago debe venir del webhook y de la consulta server-side a Mercado Pago.
 
+## Estado validado en paralelo
+
+Durante la sesion del 2026-04-04 se valido en paralelo este flujo nuevo:
+
+1. Apps Script paralelo recibe `create_lead`.
+2. Guarda el lead en `Leads_Test_Migracion` con `external_reference` unico.
+3. Crea una preferencia dinamica de Mercado Pago con `preference_id` e `init_point`.
+4. Render expone el webhook nuevo y responde correctamente en `/health`.
+5. El checkout dinamico abre correctamente en Mercado Pago para la entrada VIP de `$100.000`.
+
+Todavia no esta certificada de punta a punta la etapa final `Mercado Pago -> webhook -> actualizacion de Sheets` porque no se ejecuto un pago real ni una prueba con credenciales sandbox operativas.
+
+## Estado de produccion
+
+- La landing publica sigue apuntando al Apps Script anterior en `LEAD_ENDPOINT_URL`.
+- El webhook global de Mercado Pago fue restaurado a la URL anterior para no romper conciliacion real.
+- El flujo nuevo sigue desplegado en paralelo en `dev-barbara` y en Render, listo para una prueba final controlada.
+
 ## Documentos clave
 
 - Para arquitectura de pagos: `contexto-plan-mercadopago-apps-script.md`
