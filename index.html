@@ -937,7 +937,10 @@
             return;
           }
           console.log('JSON parseado:', json);
-          if (json && json.init_point) {
+          if (json && json.sandbox_init_point) {
+            currentPayUrl = json.sandbox_init_point;
+            console.log('Usando sandbox_init_point:', currentPayUrl);
+          } else if (json && json.init_point) {
             currentPayUrl = json.init_point;
             console.log('Usando init_point:', currentPayUrl);
           } else {
