@@ -916,37 +916,21 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbx7JHOglFIGorRhcrOtrTTuUmTENP5-SFNj8J3L6PovT7YUUzo7-3Rg-3E4SoSMJ2j-/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbz9e8aQX5YaEyC11ct18vyTnOaMZTGDzQnIYiGioFWU9Dzg3Dm8s2rFWsn1nxXf1X8W/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
       }
 
       fetch(SHEET_URL, { method: 'POST', body: data })
-        .then(function(response) {
-          console.log('Response status:', response.status);
-          console.log('Response URL:', response.url);
-          return response.text();
-        })
-        .then(function(text) {
-          console.log('Response body:', text);
-          var json;
-          try { json = JSON.parse(text); } catch(e) {
-            console.error('No es JSON válido:', e);
-            showSuccessAndPay();
-            return;
-          }
-          console.log('JSON parseado:', json);
+        .then(function(response) { return response.json(); })
+        .then(function(json) {
           if (json && json.init_point) {
             currentPayUrl = json.init_point;
-            console.log('Usando init_point:', currentPayUrl);
-          } else {
-            console.warn('No se encontró init_point en la respuesta');
           }
           showSuccessAndPay();
         })
-        .catch(function(err) {
-          console.error('Error en fetch:', err);
+        .catch(function() {
           showSuccessAndPay();
         });
     });
@@ -969,7 +953,7 @@
       var paymentId = params.get('payment_id') || params.get('collection_id');
 
       if (status && externalRef) {
-        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbx7JHOglFIGorRhcrOtrTTuUmTENP5-SFNj8J3L6PovT7YUUzo7-3Rg-3E4SoSMJ2j-/exec';
+        var SHEET_URL = 'https://script.google.com/macros/s/AKfycbz9e8aQX5YaEyC11ct18vyTnOaMZTGDzQnIYiGioFWU9Dzg3Dm8s2rFWsn1nxXf1X8W/exec';
         var updateData = new FormData();
         updateData.append('action', 'update_status');
         updateData.append('external_reference', externalRef);
