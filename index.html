@@ -916,15 +916,23 @@
       data.append('fecha', new Date().toLocaleString('es-AR'));
       data.append('estado_pago', 'Pendiente');
 
-      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyaE0npm7Y2oE54XKU3AU_yw8-CC4LwDf3ws4syNuJag1xV5LVrfiTLYvmSbxA-xkYX/exec';
+      var SHEET_URL = 'https://script.google.com/macros/s/AKfycbxEpTIqEvNR9DekpH-sr3FyTwwa3p_jX72vSPzlPKqAdwYIE1otElJph46iutJf2TQb/exec';
 
       if (typeof fbq === 'function') {
         fbq('track', 'Lead');
       }
 
       fetch(SHEET_URL, { method: 'POST', body: data })
-        .then(function() { showSuccessAndPay(); })
-        .catch(function() { showSuccessAndPay(); });
+        .then(function(response) { return response.json(); })
+        .then(function(json) {
+          if (json && json.init_point) {
+            currentPayUrl = json.init_point;
+          }
+          showSuccessAndPay();
+        })
+        .catch(function() {
+          showSuccessAndPay();
+        });
     });
 
     function showSuccessAndPay() {
