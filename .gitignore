@@ -1,9 +1,13 @@
 .DS_Store
 Thumbs.db
 .vscode/
+!.vscode/
+.vscode/*
+!.vscode/settings.json
 .idea/
 .env
 .env.*
+!integrations/mercadopago-webhook/.env.example
 *.pem
 *.key
 *.p12
