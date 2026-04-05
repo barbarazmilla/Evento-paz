@@ -34,8 +34,15 @@ Ya fue validado:
 ## Hipotesis operativas abiertas
 
 1. `createMercadoPagoPreference_` hoy envia `payer.email` con el email escrito en el formulario; si no coincide con la identidad del comprador de prueba autenticado, el pago con tarjeta puede fallar en checkout.
-2. `doPost()` rutea webhooks fuera del `try/catch`, por lo que un error dentro de `handleMercadoPagoWebhook_` puede terminar como `502`.
-3. La preferencia actual no envia `payer.first_name`, `payer.last_name`, `statement_descriptor`, `items.category_id` ni `binary_mode`, campos que ayudan a trazabilidad y aprobacion.
+2. Aunque el repo ya envuelve el webhook en `try/catch`, la version desplegada debe actualizarse para confirmar que el `502` desaparece en produccion sandbox.
+3. Aunque el repo ya envia `payer.first_name`, `payer.last_name`, `statement_descriptor`, `items.category_id` y `binary_mode`, la mejora solo quedara validada cuando la version desplegada procese una compra de prueba aprobada.
+
+## Mitigaciones ya aplicadas en el repo
+
+1. `doPost()` ya captura errores de la ruta webhook dentro del mismo `try/catch`.
+2. La preferencia ya usa `payer.first_name` y `payer.last_name` en lugar de `payer.name`.
+3. La preferencia del repo ya agrega `statement_descriptor`, `items.category_id` y `binary_mode: true`.
+4. Sigue pendiente desplegar el Apps Script actualizado y repetir la prueba controlada.
 
 ## Estado aun no certificado de punta a punta
 

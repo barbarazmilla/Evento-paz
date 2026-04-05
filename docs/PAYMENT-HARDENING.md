@@ -78,7 +78,7 @@ El navegador no puede:
 2. Que Sheets reciba un `payment_id` o un `payment_status_detail` tampoco equivale a cierre financiero; solo prueba que hubo movimiento parcial del flujo.
 3. El panel actual de `Credenciales de prueba` puede mostrar tokens sandbox con prefijo `APP_USR-`; no decidir el entorno solo por el prefijo.
 4. En pruebas de Checkout Pro con tarjeta, usar un `payer.email` diferente de la identidad autenticada del comprador puede introducir ruido o rechazo.
-5. La preferencia actual del repo envia `payer.name` y `payer.email`, pero aun no incluye campos que ayudan a aprobacion y trazabilidad como `payer.first_name`, `payer.last_name`, `statement_descriptor`, `items.category_id` y `binary_mode`.
+5. La copia actual del repo ya envia `payer.first_name`, `payer.last_name`, `statement_descriptor`, `items.category_id` y `binary_mode`, pero la mejora no queda certificada hasta desplegar el Apps Script y repetir la prueba sandbox.
 
 ## Señal de integracion sana
 

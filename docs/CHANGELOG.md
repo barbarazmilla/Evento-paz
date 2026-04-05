@@ -10,6 +10,13 @@
 - se dejaron anotadas las pistas principales del problema actual: uso de `payer.email` tomado del formulario, al menos una entrega de webhook con `502`, evaluacion MCP con `Payment was not originated from app` y pagos observados con estados `pending_waiting`, `deferred_retry` y `by_payer`;
 - esta entrada consolida diagnostico y contexto; no implica todavia una correccion funcional del flujo.
 
+### Ajustes del Apps Script para pruebas de Checkout Pro
+
+- se movio la ruta de webhook dentro del `try/catch` de `doPost()` para evitar que un error interno termine en `502` sin respuesta JSON controlada;
+- se reemplazo `payer.name` por `payer.first_name` y `payer.last_name` en la preferencia de Mercado Pago;
+- se agregaron `statement_descriptor`, `items.category_id` y `binary_mode: true` a la preferencia para mejorar trazabilidad y hacer mas determinista el resultado del pago de prueba;
+- queda pendiente desplegar la version nueva del Apps Script y volver a certificar el flujo sandbox con comprador y tarjeta de prueba.
+
 ## 2026-04-04
 
 ### Seguridad y flujo de pagos

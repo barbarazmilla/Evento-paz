@@ -31,11 +31,11 @@ function doGet() {
 function doPost(e) {
   var payload = getPayload_(e);
 
-  if (isMercadoPagoWebhook_(payload)) {
-    return jsonOutput(handleMercadoPagoWebhook_(payload));
-  }
-
   try {
+    if (isMercadoPagoWebhook_(payload)) {
+      return jsonOutput(handleMercadoPagoWebhook_(payload));
+    }
+
     var action = normalizeAction_(payload.action || 'create_lead');
 
     if (action === 'create_lead') {
@@ -326,21 +326,26 @@ function mapRowToHeaders_(rowObject) {
 
 function createMercadoPagoPreference_(row) {
   var ticketDetails = resolveTicketDetails_(row.tipo_entrada);
+  var payerName = splitPayerName_(row.nombre);
   var body = {
     items: [{
       id: row.lead_id,
       title: ticketDetails.title,
       description: ticketDetails.description,
+      category_id: 'tickets',
       quantity: 1,
       currency_id: 'ARS',
       unit_price: ticketDetails.unit_price
     }],
     payer: {
-      name: row.nombre,
+      first_name: payerName.first_name,
+      last_name: payerName.last_name,
       email: row.email
     },
     external_reference: row.external_reference,
     notification_url: buildMercadoPagoNotificationUrl_(),
+    statement_descriptor: 'PAZ CORNU EVENTO',
+    binary_mode: true,
     metadata: {
       lead_id: row.lead_id,
       source: row.source,
@@ -411,7 +416,7 @@ function resolveTicketDetails_(tipoEntrada) {
     return {
       title: 'Entrada General - Wine Experience by Paz Cornu',
       description: 'Acceso general para Wine Experience by Paz Cornu',
-      unit_price: 70000
+      unit_price: 5
     };
   }
 
@@ -420,6 +425,18 @@ function resolveTicketDetails_(tipoEntrada) {
 
 function resolveExpectedAmount_(tipoEntrada) {
   return String(resolveTicketDetails_(tipoEntrada).unit_price);
+}
+
+function splitPayerName_(fullName) {
+  var normalized = sanitizeText_(fullName, 120);
+  var parts = normalized ? normalized.split(/\s+/) : [];
+  var firstName = parts.shift() || 'Cliente';
+  var lastName = parts.join(' ').trim() || firstName;
+
+  return {
+    first_name: firstName,
+    last_name: lastName
+  };
 }
 
 function getPayload_(e) {
