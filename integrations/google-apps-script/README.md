@@ -1,16 +1,13 @@
-# Google Apps Script
+# Google Apps Script Activo
 
-Este directorio ahora conserva dos copias distintas de Apps Script que no deben mezclarse.
+La unica app de Google Apps Script en uso para este proyecto es `Paz Cornu Migracion Segura`.
 
 ## Archivos en repo
 
 - `integrations/google-apps-script/Code.gs`
-- `integrations/google-apps-script/Code-legacy-browser-flow.gs`
 - `integrations/google-apps-script/appsscript.json`
 
-`Code.gs` representa el flujo nuevo alineado con la arquitectura documentada del repo.
-
-`Code-legacy-browser-flow.gs` conserva otro Apps Script distinto, basado en formulario directo, webhook dentro de Apps Script y Meta CAPI.
+`Code.gs` representa el flujo activo alineado con la arquitectura documentada del repo.
 
 Si alguien modifica el script directamente en Google Apps Script y no replica el cambio aca, el repo queda desalineado.
 
@@ -30,22 +27,6 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 - `MP_ACCESS_TOKEN`
 - `MP_NOTIFICATION_URL`
 - `MP_RETURN_URL` opcional
-
-## Code-legacy-browser-flow.gs
-
-Incluye un segundo `doPost` distinto y estas piezas heredadas:
-
-- `action=update_status` desde redirect del navegador
-- `manejarFormulario`
-- `manejarWebhookMercadoPago`
-- `enviarPurchaseAMeta`
-- `probarPreferenciaVIP`
-- `probarPurchaseMeta`
-
-Propiedades extra de ese flujo legacy:
-
-- `META_ACCESS_TOKEN`
-- `META_TEST_EVENT_CODE` opcional
 
 ## Despliegue
 
@@ -103,7 +84,7 @@ El webhook server-side envia JSON con:
 
 ## Nota operativa
 
-No volver a pegar ambos scripts en un mismo archivo. Si se hace eso, Apps Script deja activa solo la ultima definicion repetida y el comportamiento real queda ambiguo.
+`Formulario Paz` queda fuera del flujo activo y no debe volver a referenciarse desde la landing, Render ni la documentacion operativa principal.
 
 ## Pruebas manuales
 

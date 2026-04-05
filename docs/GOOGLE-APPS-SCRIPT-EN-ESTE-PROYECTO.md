@@ -4,6 +4,8 @@
 
 En este proyecto, Google Apps Script cumple el rol de backend minimo.
 
+La unica app activa para este rol es `Paz Cornu Migracion Segura`.
+
 No renderiza la landing y no reemplaza a Mercado Pago.
 
 Hace tres trabajos concretos:
@@ -81,3 +83,5 @@ No reemplaza a un backend dedicado si el proyecto necesita:
 ## Regla simple para operar bien
 
 Si una venta puede marcarse como aprobada sin pasar por el webhook y la API oficial de Mercado Pago, la integracion esta mal cerrada.
+
+`Formulario Paz` queda fuera del flujo vigente y no debe reutilizarse para la operacion actual.

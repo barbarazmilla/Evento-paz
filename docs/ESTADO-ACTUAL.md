@@ -5,6 +5,7 @@ Fecha de referencia: 2026-04-05.
 ## Flujo activo del repo
 
 - Frontend activo: `index.html`
+- Apps Script activo en uso: `Paz Cornu Migracion Segura`
 - Lead endpoint activo esperado: `https://script.google.com/macros/s/AKfycby7eoXE2YO7sBcpAdhPy4b1BAC7JGbFQYEMJ0B55OlHnhHbgh9S8vfmpb5kU_ltciD52A/exec`
 - Webhook activo esperado: `https://evento-paz.onrender.com/webhooks/mercadopago`
 - Healthcheck del webhook: `https://evento-paz.onrender.com/health`
@@ -33,6 +34,10 @@ Todavia falta certificar con una compra real o sandbox funcional controlada:
 2. El material legacy que ya no participa del flujo actual fue retirado del recorrido principal.
 3. La unica fuente viva del Apps Script en repo es `integrations/google-apps-script/Code.gs`.
 4. La sincronizacion con Google Apps Script sigue siendo manual.
+
+## Aplicacion que no se usa
+
+`Formulario Paz` no forma parte del flujo activo y no debe usarse como endpoint de la landing ni como destino del webhook.
 
 ## Riesgos vigentes
 
