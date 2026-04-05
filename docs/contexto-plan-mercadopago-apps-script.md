@@ -17,7 +17,7 @@ La confirmacion real del pago no debe depender del navegador.
 
 La fuente de verdad es:
 
-`Mercado Pago -> webhook server-side -> consulta API oficial -> update_payment -> Google Sheets`
+`Mercado Pago -> Apps Script Web App -> consulta API oficial -> Google Sheets`
 
 ## Papel de Apps Script
 
@@ -26,8 +26,9 @@ Apps Script sigue siendo el backend minimo del proyecto para:
 1. recibir `create_lead`,
 2. escribir la fila inicial,
 3. crear la preferencia dinamica,
-4. recibir `update_payment` autenticado,
-5. actualizar la fila correcta por `external_reference`.
+4. recibir el webhook directo de Mercado Pago,
+5. consultar el pago oficial,
+6. actualizar la fila correcta por `external_reference`.
 
 ## Historial
 

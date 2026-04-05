@@ -13,11 +13,19 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 
 ## Code.gs activo
 
-1. `doGet` para healthcheck,
-2. bloque de `create_lead` y `update_payment`,
-3. helper `authorizeServices`,
-4. preferencia dinamica con `external_reference`,
-5. actualizacion server-side por `update_payment`.
+1. `doGet` para healthcheck.
+2. `create_lead` para capturar el lead y crear la preferencia.
+3. recepcion directa del webhook de Mercado Pago.
+4. ruta operativa `update_payment` para uso privado y controlado.
+5. helper `authorizeServices`.
+6. preferencia dinamica con `external_reference`.
+
+## Stack objetivo
+
+1. GitHub Pages hospeda la landing.
+2. Apps Script recibe leads y webhooks.
+3. Google Sheets guarda estado operativo.
+4. Mercado Pago notifica directo al Apps Script usando la URL armada por `Code.gs`.
 
 ## Script Properties requeridas
 
@@ -28,14 +36,18 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 - `MP_NOTIFICATION_URL`
 - `MP_RETURN_URL` opcional
 
+`MP_NOTIFICATION_URL` debe guardarse como la URL base `/exec` del Web App, sin query params. `Code.gs` agrega `source_news=webhooks` y `webhook_secret` automaticamente al crear la preferencia.
+
 ## Despliegue
 
 1. Crear un proyecto de Apps Script.
 2. Copiar `Code.gs` y `appsscript.json`.
 3. Configurar Script Properties.
-4. Desplegar como Web App.
-5. Ejecutar como tu usuario.
-6. Dar acceso publico solo porque `create_lead` necesita ser alcanzable desde la landing.
+4. Ejecutar `authorizeServices` una vez para aprobar scopes.
+5. Desplegar como Web App.
+6. Ejecutar como tu usuario.
+7. Dar acceso publico solo porque `create_lead` y el webhook directo necesitan ser alcanzables desde afuera.
+8. Guardar la URL `/exec` desplegada como base operativa del script.
 
 ## Sync manual recomendado
 
@@ -44,7 +56,7 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 3. Verificar `appsscript.json` si hubo cambios de manifest.
 4. Desplegar una nueva version como Web App.
 5. Confirmar que la URL activa siga siendo la esperada en `index.html`.
-6. Ejecutar `doGet` y una prueba de `create_lead`.
+6. Ejecutar `doGet`, una prueba de `create_lead` y una simulacion de webhook.
 
 Si el cambio se hizo directamente en Google Apps Script, bajar ese cambio manualmente al repo el mismo dia.
 
@@ -68,9 +80,19 @@ Respuesta exitosa:
 - `preference_id`
 - `init_point`
 
-## Accion privada del flujo nuevo
+## Webhook directo de Mercado Pago
 
-El webhook server-side envia JSON con:
+1. La preferencia sale con `notification_url` construida desde `MP_NOTIFICATION_URL`.
+2. `Code.gs` agrega `source_news=webhooks` y `webhook_secret` a esa URL.
+3. Cuando llega la notificacion, el script extrae `payment_id` del body o del query param equivalente.
+4. Luego consulta `GET /v1/payments/{id}` con `MP_ACCESS_TOKEN`.
+5. La fila correcta se actualiza por `external_reference`.
+
+## Ruta operativa privada
+
+`update_payment` sigue disponible para pruebas controladas o correcciones privadas.
+
+Payload esperado:
 
 - `action: update_payment`
 - `webhook_secret`
@@ -84,7 +106,7 @@ El webhook server-side envia JSON con:
 
 ## Nota operativa
 
-`Formulario Paz` queda fuera del flujo activo y no debe volver a referenciarse desde la landing, Render ni la documentacion operativa principal.
+`Formulario Paz` queda fuera del flujo activo y no debe volver a referenciarse desde la landing ni la documentacion operativa principal.
 
 ## Pruebas manuales
 
@@ -110,24 +132,24 @@ curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec' \
   -F 'source=prueba_manual'
 ```
 
-### Actualizacion privada
+### Simulacion controlada del webhook
 
 ```bash
-curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec' \
+curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec?source_news=webhooks&webhook_secret=REEMPLAZAR&data.id=999999999' \
   -H 'Content-Type: application/json' \
   -d '{
-    "action": "update_payment",
-    "webhook_secret": "REEMPLAZAR",
-    "external_reference": "ext_123",
-    "payment_id": "999999999",
-    "status": "approved",
-    "status_detail": "accredited",
-    "transaction_amount": "100000",
-    "currency_id": "ARS",
-    "approved_at": "2026-04-04T20:00:00Z"
+    "type": "payment",
+    "action": "payment.created",
+    "data": {
+      "id": "999999999"
+    }
   }'
 ```
+
+Para pruebas reales de recepcion, priorizar la simulacion desde Tus Integraciones de Mercado Pago.
 
 ## Observacion
 
 Este script sigue siendo una solucion liviana. Si la operacion escala, conviene mover la conciliacion a un backend mas fuerte y dejar Apps Script como adaptador de Sheets.
+
+La documentacion oficial de Apps Script Web Apps no documenta de forma equivalente acceso a headers entrantes personalizados, por lo que la validacion HMAC por `x-signature` queda como trabajo pendiente de hardening.

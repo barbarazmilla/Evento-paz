@@ -2,7 +2,7 @@
  * Evento Paz - Apps Script activo
  *
  * Esta copia representa el Apps Script del flujo nuevo basado en:
- * create_lead -> preferencia dinamica -> webhook server-side -> update_payment.
+ * create_lead -> preferencia dinamica -> webhook directo en Apps Script -> Google Sheets.
  */
 
 var SHEET_HEADERS = [
@@ -29,8 +29,13 @@ function doGet() {
 }
 
 function doPost(e) {
+  var payload = getPayload_(e);
+
+  if (isMercadoPagoWebhook_(payload)) {
+    return jsonOutput(handleMercadoPagoWebhook_(payload));
+  }
+
   try {
-    var payload = getPayload_(e);
     var action = normalizeAction_(payload.action || 'create_lead');
 
     if (action === 'create_lead') {
@@ -110,6 +115,75 @@ function createLead_(payload) {
 function updatePayment_(payload) {
   assertWebhookSecret_(payload.webhook_secret);
 
+  var updateResult = finalizePaymentUpdate_(payload);
+
+  return {
+    ok: true,
+    updated: updateResult.updated,
+    already_applied: updateResult.already_applied
+  };
+}
+
+function handleMercadoPagoWebhook_(payload) {
+  assertWebhookSecret_(payload.webhook_secret);
+
+  var topic = normalizeAction_(payload.type || payload.topic || 'payment');
+  if (topic && topic !== 'payment') {
+    return {
+      ok: true,
+      ignored: 'unsupported_topic',
+      topic: topic
+    };
+  }
+
+  var paymentId = extractPaymentId_(payload);
+  if (!paymentId) {
+    return {
+      ok: true,
+      ignored: 'missing_payment_id'
+    };
+  }
+
+  var payment = fetchMercadoPagoPayment_(paymentId);
+  if (!payment || !payment.id) {
+    return {
+      ok: true,
+      ignored: 'payment_not_found',
+      payment_id: String(paymentId)
+    };
+  }
+
+  if (!payment.external_reference) {
+    return {
+      ok: true,
+      ignored: 'missing_external_reference',
+      payment_id: String(payment.id)
+    };
+  }
+
+  var updateResult = finalizePaymentUpdate_({
+    external_reference: String(payment.external_reference || ''),
+    status: String(payment.status || ''),
+    status_detail: String(payment.status_detail || ''),
+    payment_id: String(payment.id || ''),
+    transaction_amount: String(payment.transaction_amount || ''),
+    currency_id: String(payment.currency_id || ''),
+    approved_at: String(payment.date_approved || ''),
+    webhook_secret: payload.webhook_secret
+  });
+
+  return {
+    ok: true,
+    payment_id: String(payment.id),
+    external_reference: String(payment.external_reference),
+    status: String(payment.status || ''),
+    updated: updateResult.updated,
+    already_applied: updateResult.already_applied
+  };
+}
+
+function finalizePaymentUpdate_(payload) {
+
   var externalReference = sanitizeText_(payload.external_reference, 120);
   var paymentStatus = sanitizeText_(payload.status, 40);
   var paymentStatusDetail = sanitizeText_(payload.status_detail, 120);
@@ -126,7 +200,7 @@ function updatePayment_(payload) {
     throw new Error('status_required');
   }
 
-  var updated = updateRowByExternalReference_({
+  return updateRowByExternalReference_({
     external_reference: externalReference,
     payment_status: paymentStatus,
     payment_status_detail: paymentStatusDetail,
@@ -137,10 +211,6 @@ function updatePayment_(payload) {
     updated_at: new Date().toISOString()
   });
 
-  return {
-    ok: true,
-    updated: updated
-  };
 }
 
 function rejectSpam_(payload) {
@@ -182,12 +252,31 @@ function updateRowByExternalReference_(changes) {
 
     for (var rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
       if (String(values[rowIndex][externalReferenceIndex]) === changes.external_reference) {
+        var nextRow = values[rowIndex].slice();
+        var hasChanges = false;
+
         SHEET_HEADERS.forEach(function(header, headerIndex) {
           if (Object.prototype.hasOwnProperty.call(changes, header)) {
-            sheet.getRange(rowIndex + 1, headerIndex + 1).setValue(changes[header]);
+            var nextValue = String(changes[header] || '');
+            if (String(nextRow[headerIndex] || '') !== nextValue) {
+              nextRow[headerIndex] = nextValue;
+              hasChanges = true;
+            }
           }
         });
-        return true;
+
+        if (!hasChanges) {
+          return {
+            updated: false,
+            already_applied: true
+          };
+        }
+
+        sheet.getRange(rowIndex + 1, 1, 1, SHEET_HEADERS.length).setValues([nextRow]);
+        return {
+          updated: true,
+          already_applied: false
+        };
       }
     }
 
@@ -251,7 +340,7 @@ function createMercadoPagoPreference_(row) {
       email: row.email
     },
     external_reference: row.external_reference,
-    notification_url: getRequiredProperty_('MP_NOTIFICATION_URL'),
+    notification_url: buildMercadoPagoNotificationUrl_(),
     metadata: {
       lead_id: row.lead_id,
       source: row.source,
@@ -334,18 +423,122 @@ function resolveExpectedAmount_(tipoEntrada) {
 }
 
 function getPayload_(e) {
+  var payload = {};
+
   if (!e) {
-    return {};
+    return payload;
+  }
+
+  if (e.parameter) {
+    Object.keys(e.parameter).forEach(function(key) {
+      payload[key] = e.parameter[key];
+    });
   }
 
   if (e.postData && e.postData.contents) {
     var contentType = String(e.postData.type || '').toLowerCase();
     if (contentType.indexOf('application/json') !== -1) {
-      return JSON.parse(e.postData.contents);
+      var parsed = parseJson_(e.postData.contents);
+      Object.keys(parsed).forEach(function(key) {
+        payload[key] = parsed[key];
+      });
     }
   }
 
-  return e.parameter || {};
+  return payload;
+}
+
+function isMercadoPagoWebhook_(payload) {
+  if (!payload) {
+    return false;
+  }
+
+  var action = normalizeAction_(payload.action || '');
+  if (action === 'create_lead' || action === 'update_payment') {
+    return false;
+  }
+
+  if (payload.data && payload.data.id) {
+    return true;
+  }
+
+  if (payload['data.id']) {
+    return true;
+  }
+
+  if (action.indexOf('payment.') === 0) {
+    return true;
+  }
+
+  return normalizeAction_(payload.type || payload.topic || '') === 'payment';
+}
+
+function extractPaymentId_(payload) {
+  if (payload.data && payload.data.id) {
+    return sanitizeText_(payload.data.id, 80);
+  }
+
+  if (payload['data.id']) {
+    return sanitizeText_(payload['data.id'], 80);
+  }
+
+  if (!payload.type && !payload.topic && !payload.action && payload.id) {
+    return sanitizeText_(payload.id, 80);
+  }
+
+  return '';
+}
+
+function fetchMercadoPagoPayment_(paymentId) {
+  var accessToken = getRequiredProperty_('MP_ACCESS_TOKEN');
+  var response = UrlFetchApp.fetch('https://api.mercadopago.com/v1/payments/' + encodeURIComponent(paymentId), {
+    method: 'get',
+    headers: {
+      Authorization: 'Bearer ' + accessToken
+    },
+    muteHttpExceptions: true
+  });
+  var statusCode = response.getResponseCode();
+  var responseText = response.getContentText();
+  var parsed = parseJson_(responseText);
+
+  if (statusCode === 404) {
+    return null;
+  }
+
+  if (statusCode < 200 || statusCode >= 300) {
+    throw new Error('mercadopago_payment_error_' + statusCode + ': ' + responseText);
+  }
+
+  if (!parsed.id) {
+    throw new Error('mercadopago_payment_invalid_response');
+  }
+
+  return parsed;
+}
+
+function buildMercadoPagoNotificationUrl_() {
+  return appendQueryParams_(getRequiredProperty_('MP_NOTIFICATION_URL'), {
+    source_news: 'webhooks',
+    webhook_secret: getRequiredProperty_('WEBHOOK_SHARED_SECRET')
+  });
+}
+
+function appendQueryParams_(url, params) {
+  var entries = [];
+
+  Object.keys(params).forEach(function(key) {
+    var value = params[key];
+    if (value !== null && value !== undefined && String(value) !== '') {
+      entries.push(encodeURIComponent(key) + '=' + encodeURIComponent(String(value)));
+    }
+  });
+
+  if (!entries.length) {
+    return url;
+  }
+
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + entries.join('&');
 }
 
 function assertWebhookSecret_(receivedSecret) {

@@ -7,7 +7,6 @@ Thumbs.db
 .idea/
 .env
 .env.*
-!integrations/mercadopago-webhook/.env.example
 *.pem
 *.key
 *.p12

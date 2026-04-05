@@ -8,13 +8,12 @@ La unica app activa para este rol es `Paz Cornu Migracion Segura`.
 
 No renderiza la landing y no reemplaza a Mercado Pago.
 
-Hace tres trabajos concretos:
+Hace cuatro trabajos concretos:
 
 1. recibe el lead desde la landing,
 2. escribe la fila inicial en Google Sheets,
-3. crea la preferencia de Mercado Pago y devuelve el `init_point`.
-
-Despues recibe la actualizacion privada del webhook y actualiza la conciliacion.
+3. crea la preferencia de Mercado Pago y devuelve el `init_point`,
+4. recibe el webhook directo de Mercado Pago, consulta la API oficial y actualiza la conciliacion.
 
 ## Como pensarlo en una clase
 
@@ -40,9 +39,18 @@ Apps Script no es la caja ni el mostrador. Es el administrativo que anota cada o
 8. Crea una preferencia en Mercado Pago usando credenciales privadas guardadas en Script Properties.
 9. Devuelve `init_point` al frontend.
 
-## Que hace cuando llega `update_payment`
+## Que hace cuando llega el webhook directo de Mercado Pago
 
-1. Recibe un JSON desde el webhook server-side.
+1. Recibe la notificacion `payment` en el mismo Web App.
+2. Exige `webhook_secret` por query string en la URL de notificacion.
+3. Extrae `payment_id` del body o del query param recibido.
+4. Consulta la API oficial de Mercado Pago usando `MP_ACCESS_TOKEN`.
+5. Busca la fila correcta por `external_reference`.
+6. Actualiza `payment_status`, `payment_status_detail`, `payment_id`, monto, moneda y fecha.
+
+## Para que queda `update_payment`
+
+1. Recibe un JSON solo para operacion controlada o pruebas privadas.
 2. Exige `webhook_secret`.
 3. Busca la fila por `external_reference`.
 4. Actualiza `payment_status`, `payment_status_detail`, `payment_id`, monto, moneda y fecha.
@@ -79,6 +87,8 @@ No reemplaza a un backend dedicado si el proyecto necesita:
 3. firmas y seguridad mas robusta,
 4. alta concurrencia,
 5. auditoria fuerte.
+
+La documentacion oficial de Apps Script Web Apps describe query params y body en `doPost`, pero no documenta de la misma forma acceso a headers entrantes personalizados. Por eso, este repo usa `webhook_secret` dentro de la URL de notificacion mas la consulta oficial a Mercado Pago como compuerta actual del webhook.
 
 ## Regla simple para operar bien
 

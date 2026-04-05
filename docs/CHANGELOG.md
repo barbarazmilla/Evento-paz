@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-04-05
+
+### Documentacion de diagnostico sandbox
+
+- se actualizo la documentacion operativa para dejar por escrito el estado real de la investigacion del Checkout Pro de prueba antes de aplicar cambios de codigo;
+- se registro que el checkout dinamico abre, el lead se guarda en Sheets y existen actualizaciones parciales via webhook, pero aun no se obtuvo un pago de tarjeta de prueba en estado `approved`;
+- se documento como dato operativo que el panel de `Credenciales de prueba` hoy puede mostrar Access Token sandbox con prefijo `APP_USR-`, por lo que el prefijo ya no alcanza por si solo para distinguir sandbox de produccion;
+- se dejaron anotadas las pistas principales del problema actual: uso de `payer.email` tomado del formulario, al menos una entrega de webhook con `502`, evaluacion MCP con `Payment was not originated from app` y pagos observados con estados `pending_waiting`, `deferred_retry` y `by_payer`;
+- esta entrada consolida diagnostico y contexto; no implica todavia una correccion funcional del flujo.
+
 ## 2026-04-04
 
 ### Seguridad y flujo de pagos
