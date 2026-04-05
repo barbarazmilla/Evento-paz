@@ -11,11 +11,11 @@ Payment creation, webhook handling, Google Sheets updates, and Mercado Pago API 
 
 The file `integrations/google-apps-script/Code.gs` is the only repository copy of the active Apps Script logic. Treat it as the versioned source copy that must be kept manually in sync with the deployed script.
 
-If a task changes payment behavior, first read [contexto-plan-mercadopago-apps-script.md](../contexto-plan-mercadopago-apps-script.md) and treat it as the source of truth for the intended architecture.
+If a task changes payment behavior, first read [contexto-plan-mercadopago-apps-script.md](../docs/contexto-plan-mercadopago-apps-script.md) and treat it as the source of truth for the intended architecture.
 
 If a task needs overall repo context, onboarding, or file map, read `README.md` first.
 
-For business context, scope, and event details, see [propuesta-comercial-evento.md](../propuesta-comercial-evento.md).
+For business context, scope, and event details, see [propuesta-comercial-evento.md](../docs/propuesta-comercial-evento.md).
 
 ## Build and Test
 

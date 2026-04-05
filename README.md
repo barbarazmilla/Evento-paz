@@ -15,12 +15,12 @@ No hay build pipeline ni tests automaticos.
 
 ## Empezar por aca
 
-1. `ARQUITECTURA-ACTUAL.md`
-2. `ESTADO-ACTUAL.md`
-3. `GOOGLE-APPS-SCRIPT-EN-ESTE-PROYECTO.md`
-4. `OPERACION-Y-VERIFICACION.md`
-5. `SECURITY.md`
-6. `PAYMENT-HARDENING.md`
+1. `docs/ARQUITECTURA-ACTUAL.md`
+2. `docs/ESTADO-ACTUAL.md`
+3. `docs/GOOGLE-APPS-SCRIPT-EN-ESTE-PROYECTO.md`
+4. `docs/OPERACION-Y-VERIFICACION.md`
+5. `docs/SECURITY.md`
+6. `docs/PAYMENT-HARDENING.md`
 
 ## Flujo activo resumido
 
@@ -36,9 +36,10 @@ La confirmacion real del pago no depende del navegador.
 ## Estructura util
 
 - `index.html`: landing principal y unico frontend activo.
+- `docs/`: documentacion operativa y de contexto del proyecto.
 - `integrations/google-apps-script/`: fuente local del script activo.
 - `integrations/mercadopago-webhook/`: webhook server-side.
-- `propuesta-comercial-evento.md`: contexto comercial.
+- `docs/propuesta-comercial-evento.md`: contexto comercial.
 
 ## Verificacion manual
 
