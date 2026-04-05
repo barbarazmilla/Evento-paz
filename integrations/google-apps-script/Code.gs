@@ -1,10 +1,8 @@
 /**
  * Evento Paz - Apps Script activo
  *
- * Fuente viva en repo: integrations/google-apps-script/Code.gs
- * Sync con Google Apps Script: manual
- * URL activa esperada al 2026-04-05:
- * https://script.google.com/macros/s/AKfycby7eoXE2YO7sBcpAdhPy4b1BAC7JGbFQYEMJ0B55OlHnhHbgh9S8vfmpb5kU_ltciD52A/exec
+ * Esta copia representa el Apps Script del flujo nuevo basado en:
+ * create_lead -> preferencia dinamica -> webhook server-side -> update_payment.
  */
 
 var SHEET_HEADERS = [
@@ -409,4 +407,10 @@ function jsonOutput(payload) {
   return ContentService
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function authorizeServices() {
+  SpreadsheetApp.openById(getRequiredProperty_('SPREADSHEET_ID')).getId();
+  UrlFetchApp.getRequest('https://api.mercadopago.com');
+  return true;
 }

@@ -1,28 +1,26 @@
-# Google Apps Script Activo
+# Google Apps Script
 
-Fuente local del Apps Script que hoy define el contrato de captura y conciliacion.
+Este directorio ahora conserva dos copias distintas de Apps Script que no deben mezclarse.
 
-## Fuente de verdad en repo
-
-La unica copia viva del Apps Script en este proyecto es:
+## Archivos en repo
 
 - `integrations/google-apps-script/Code.gs`
+- `integrations/google-apps-script/Code-legacy-browser-flow.gs`
 - `integrations/google-apps-script/appsscript.json`
 
-No hay otra copia activa en la raiz.
+`Code.gs` representa el flujo nuevo alineado con la arquitectura documentada del repo.
+
+`Code-legacy-browser-flow.gs` conserva otro Apps Script distinto, basado en formulario directo, webhook dentro de Apps Script y Meta CAPI.
 
 Si alguien modifica el script directamente en Google Apps Script y no replica el cambio aca, el repo queda desalineado.
 
-## Que hace
+## Code.gs activo
 
-1. expone `doGet` para healthcheck,
-2. recibe `create_lead`,
-3. valida y sanitiza el payload,
-4. escribe la fila inicial en Google Sheets,
-5. crea una preferencia dinamica de Mercado Pago,
-6. devuelve `lead_id`, `external_reference`, `preference_id` e `init_point`,
-7. recibe `update_payment` solo con secreto compartido,
-8. actualiza la fila correcta por `external_reference`.
+1. `doGet` para healthcheck,
+2. bloque de `create_lead` y `update_payment`,
+3. helper `authorizeServices`,
+4. preferencia dinamica con `external_reference`,
+5. actualizacion server-side por `update_payment`.
 
 ## Script Properties requeridas
 
@@ -32,6 +30,22 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 - `MP_ACCESS_TOKEN`
 - `MP_NOTIFICATION_URL`
 - `MP_RETURN_URL` opcional
+
+## Code-legacy-browser-flow.gs
+
+Incluye un segundo `doPost` distinto y estas piezas heredadas:
+
+- `action=update_status` desde redirect del navegador
+- `manejarFormulario`
+- `manejarWebhookMercadoPago`
+- `enviarPurchaseAMeta`
+- `probarPreferenciaVIP`
+- `probarPurchaseMeta`
+
+Propiedades extra de ese flujo legacy:
+
+- `META_ACCESS_TOKEN`
+- `META_TEST_EVENT_CODE` opcional
 
 ## Despliegue
 
@@ -53,7 +67,7 @@ Si alguien modifica el script directamente en Google Apps Script y no replica el
 
 Si el cambio se hizo directamente en Google Apps Script, bajar ese cambio manualmente al repo el mismo dia.
 
-## Accion publica
+## Accion publica del flujo nuevo
 
 El frontend envia `FormData` con:
 
@@ -73,7 +87,7 @@ Respuesta exitosa:
 - `preference_id`
 - `init_point`
 
-## Accion privada
+## Accion privada del flujo nuevo
 
 El webhook server-side envia JSON con:
 
@@ -86,6 +100,10 @@ El webhook server-side envia JSON con:
 - `transaction_amount`
 - `currency_id`
 - `approved_at`
+
+## Nota operativa
+
+No volver a pegar ambos scripts en un mismo archivo. Si se hace eso, Apps Script deja activa solo la ultima definicion repetida y el comportamiento real queda ambiguo.
 
 ## Pruebas manuales
 
