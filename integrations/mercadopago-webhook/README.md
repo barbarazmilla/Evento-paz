@@ -1,13 +1,22 @@
-# Webhook Base De Mercado Pago
+# Webhook Server-Side Activo
 
-Servidor Node minimo para recibir notificaciones de Mercado Pago, validar el pago contra la API oficial y actualizar Google Apps Script del lado servidor.
+Servidor Node minimo para reconciliar pagos de Mercado Pago fuera del navegador.
+
+## Que hace
+
+1. recibe la notificacion en `POST /webhooks/mercadopago`,
+2. extrae `payment_id`,
+3. consulta `GET /v1/payments/{id}` en Mercado Pago,
+4. toma `external_reference`, estado y monto real,
+5. envia `update_payment` autenticado al Apps Script.
 
 ## Requisitos
 
 - Node 20 o superior
 - `MP_ACCESS_TOKEN`
-- URL del Apps Script desplegado
-- `APPS_SCRIPT_SHARED_SECRET` igual al configurado en Apps Script
+- `APPS_SCRIPT_URL`
+- `APPS_SCRIPT_SHARED_SECRET`
+- `MP_WEBHOOK_PATH`
 
 ## Variables de entorno
 
@@ -19,40 +28,39 @@ Copiar `.env.example` como referencia.
 - `APPS_SCRIPT_URL`
 - `APPS_SCRIPT_SHARED_SECRET`
 
+## Endpoints
+
+- `GET /health`
+- `POST /webhooks/mercadopago`
+
 ## Como correrlo
 
-1. Exportar las variables de entorno.
-2. Iniciar con `npm start`.
-3. Exponer el endpoint publico del webhook.
-4. Configurar Mercado Pago para notificar a `https://tu-dominio.com/webhooks/mercadopago`.
+1. Configurar variables de entorno.
+2. Ejecutar `npm start`.
+3. Exponer el endpoint publico.
+4. Configurar Mercado Pago para notificar a la URL publica del webhook.
 
-## Prueba manual local
-
-Payload minimo de prueba:
+## Prueba manual minima
 
 ```bash
 curl -X POST 'http://localhost:8080/webhooks/mercadopago' \
-	-H 'Content-Type: application/json' \
-	-d '{
-		"type": "payment",
-		"data": {
-			"id": "123456789"
-		}
-	}'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "type": "payment",
+    "data": {
+      "id": "123456789"
+    }
+  }'
 ```
 
-Ese request no alcanza por si solo para una prueba real: el servidor va a consultar la API oficial de Mercado Pago con `MP_ACCESS_TOKEN` y luego va a actualizar Apps Script con el secreto compartido.
+Eso solo sirve si el `payment_id` existe y el servicio puede consultar Mercado Pago con credenciales reales.
 
-## Flujo
+## Regla de seguridad
 
-1. Mercado Pago envia el webhook.
-2. El servidor extrae `payment_id`.
-3. El servidor consulta `GET /v1/payments/{id}` en Mercado Pago con el access token privado.
-4. El servidor toma `external_reference`, estado y monto real.
-5. El servidor actualiza Apps Script usando `update_payment` y un secreto compartido.
+Este servicio existe para que la venta no dependa del retorno del navegador.
 
-## Notas importantes
+Si el navegador puede cerrar una venta sin pasar por aca, la integracion esta mal cerrada.
 
-- Este servidor no confia en query params del navegador para confirmar pagos.
-- Si queres subir el nivel de seguridad, agrega validacion de firma del webhook provista por Mercado Pago.
-- Para produccion conviene persistir logs e idempotencia en una base real. Esta base ya evita falsos positivos porque siempre revalida el pago con la API oficial.
+## Mejora pendiente
+
+Agregar validacion de firma de webhook de Mercado Pago para endurecer el borde publico.

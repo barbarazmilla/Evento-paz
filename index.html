@@ -794,8 +794,7 @@
           Degustación de vinos y sabores<br>
           DJ Set: Maik Costa
         </p>
-        <!-- 🔗 Link de pago General -->
-        <a href="#" class="btn" onclick="showModal('General', '$70.000', 'https://mpago.li/1kxBrx5'); return false;">Comprar General</a>
+        <a href="#" class="btn" onclick="showModal('General', '$70.000'); return false;">Comprar General</a>
       </div>
 
       <!-- VIP -->
@@ -807,8 +806,7 @@
           <strong>Acceso cabina de fotos</strong><br>
           <strong>Beneficios y descuentos únicos</strong>
         </p>
-        <!-- 🔗 Link de pago VIP -->
-        <a href="#" class="btn btn-filled" onclick="showModal('VIP', '$100.000', 'https://mpago.li/1hRHsui'); return false;">Comprar VIP</a>
+        <a href="#" class="btn btn-filled" onclick="showModal('VIP', '$100.000'); return false;">Comprar VIP</a>
       </div>
 
     </div>
@@ -861,21 +859,21 @@
       <div class="form-success" id="formSuccess">
         ✨ Gracias por sumarte a Wine Experience by Paz Cornú.<br>Te esperamos para vivir una noche única, con estilo e increíbles sorpresas.<br><br><strong style="letter-spacing:0.15em;font-size:0.85rem;">REDIRIGIENDO AL PAGO...</strong>
       </div>
-      <button class="form-skip" id="formSkipBtn" onclick="skipForm()">Omitir y pagar directo</button>
+      <button class="form-skip" id="formSkipBtn" onclick="closeFormOverlay()">Volver</button>
     </div>
   </div>
 
   <script>
     var currentPayUrl = '';
-    var LEAD_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycbysr6cZPeJ93ZaTLwzlK1HNExBTVfs1bVgHM9YrF8PAEJUmXBPk_chOxnqtR8_1uhFo/exec';
+    var LEAD_ENDPOINT_URL = 'https://script.google.com/macros/s/AKfycby7eoXE2YO7sBcpAdhPy4b1BAC7JGbFQYEMJ0B55OlHnhHbgh9S8vfmpb5kU_ltciD52A/exec';
 
     var descriptions = {
       General: 'Desfile Colección Éter · Degustación de vinos<br>DJ Set · Wine Experience',
       VIP: 'Disfrutá degustación de vinos premium, desfile en vivo y selección gourmet de quesos y dulces.<br>Accedé a espacios exclusivos para fotos y creación de contenido con looks de la marca.<br>Beneficios únicos: <strong>20% OFF</strong> en nueva colección, hasta <strong>50% OFF</strong> en temporadas anteriores y prendas exclusivas a precio especial.<br><br><strong>Cupos limitados.</strong>'
     };
 
-    function showModal(type, price, url) {
-      currentPayUrl = url;
+    function showModal(type, price) {
+      currentPayUrl = '';
       document.getElementById('modalTicketType').textContent = 'Entrada ' + type + ' — ' + price;
       document.getElementById('modalDesc').innerHTML = descriptions[type] || '';
       document.getElementById('modalOverlay').classList.add('active');
@@ -887,31 +885,42 @@
       if (e.target === this) closeModal();
     });
 
+    function resetFormModalState() {
+      var form = document.getElementById('postPayForm');
+      var success = document.getElementById('formSuccess');
+      var submitButton = document.getElementById('formSubmitBtn');
+      var backButton = document.getElementById('formSkipBtn');
+
+      form.reset();
+      form.style.display = 'block';
+      success.style.display = 'none';
+      submitButton.disabled = false;
+      submitButton.textContent = 'Ir al pago';
+      backButton.style.display = 'inline-flex';
+    }
+
     /* ── Formulario pre-pago ── */
     function openForm() {
       if (typeof fbq === 'function') {
         fbq('track', 'InitiateCheckout');
       }
       closeModal();
+      resetFormModalState();
       document.getElementById('formOverlay').classList.add('active');
     }
     function closeFormOverlay() {
       document.getElementById('formOverlay').classList.remove('active');
     }
-    function skipForm() {
-      closeFormOverlay();
-      window.open(currentPayUrl, '_blank');
-    }
     document.getElementById('formOverlay').addEventListener('click', function(e) {
       if (e.target === this) closeFormOverlay();
     });
 
-    /* ── Enviar formulario a Google Sheets y redirigir al pago ── */
+    /* ── Enviar formulario a Apps Script y abrir checkout dinamico ── */
     document.getElementById('postPayForm').addEventListener('submit', function(e) {
       e.preventDefault();
       var btn = document.getElementById('formSubmitBtn');
       btn.disabled = true;
-      btn.textContent = 'Enviando...';
+      btn.textContent = 'Iniciando pago...';
 
       var data = new FormData(this);
       data.append('action', 'create_lead');

@@ -1,3 +1,12 @@
+/**
+ * Evento Paz - Apps Script activo
+ *
+ * Fuente viva en repo: integrations/google-apps-script/Code.gs
+ * Sync con Google Apps Script: manual
+ * URL activa esperada al 2026-04-05:
+ * https://script.google.com/macros/s/AKfycby7eoXE2YO7sBcpAdhPy4b1BAC7JGbFQYEMJ0B55OlHnhHbgh9S8vfmpb5kU_ltciD52A/exec
+ */
+
 var SHEET_HEADERS = [
   'created_at',
   'updated_at',

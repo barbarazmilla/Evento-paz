@@ -1,72 +1,55 @@
 # Evento Paz
 
-Repositorio de la landing estatica del evento y de la documentacion operativa asociada al flujo de checkout con Mercado Pago.
+Repositorio de la landing publica del evento y de la documentacion operativa del flujo activo con Mercado Pago.
 
-## Que hay en este repo
+## Estado del repo
 
-- `index.html`: landing principal del evento.
-- `landing.html`: variante alternativa.
-- `landing-tiendanube.html`: variante aislada para Tienda Nube.
-- `apps_scripts.js`: copia versionada de referencia del Google Apps Script que hoy corre fuera del repo.
-- `contexto-plan-mercadopago-apps-script.md`: plan arquitectonico y decisiones del flujo de pago.
-- `propuesta-comercial-evento.md`: contexto comercial y de alcance.
+La raiz del repo ya apunta al flujo nuevo:
 
-## Modelo operativo
+1. `index.html` captura el lead y pide una preferencia dinamica.
+2. `integrations/google-apps-script/Code.gs` es la fuente local del Apps Script activo.
+3. `integrations/mercadopago-webhook/server.js` es el webhook server-side que reconcilia pagos.
+4. Google Sheets guarda la fila inicial y la actualizacion final por `external_reference`.
 
-El sitio es frontend estatico.
+No hay build pipeline ni tests automaticos.
 
-La ejecucion real de pagos, webhooks, integracion con Mercado Pago y actualizacion de Google Sheets vive fuera del repo en Google Apps Script.
+## Empezar por aca
 
-La copia de `apps_scripts.js` existe para:
+1. `ARQUITECTURA-ACTUAL.md`
+2. `ESTADO-ACTUAL.md`
+3. `GOOGLE-APPS-SCRIPT-EN-ESTE-PROYECTO.md`
+4. `OPERACION-Y-VERIFICACION.md`
+5. `SECURITY.md`
+6. `PAYMENT-HARDENING.md`
 
-- dejar trazabilidad tecnica del script actual;
-- revisar cambios de contrato entre frontend y backend;
-- reducir el riesgo de operar logica critica completamente fuera de versionado.
+## Flujo activo resumido
 
-No existe pipeline de build ni tests automaticos.
+1. La landing envia `create_lead` al Apps Script.
+2. Apps Script valida, escribe en Sheets y crea la preferencia de Mercado Pago.
+3. El frontend abre el `init_point` recibido.
+4. Mercado Pago notifica al webhook en Render.
+5. El webhook consulta la API oficial y manda `update_payment` autenticado a Apps Script.
+6. Apps Script actualiza la fila correcta por `external_reference`.
 
-## Flujo actual
+La confirmacion real del pago no depende del navegador.
 
-1. El usuario elige ticket en `index.html`.
-2. La landing abre el modal y captura lead.
-3. El frontend envia los datos al Apps Script.
-4. El Apps Script devuelve `init_point`.
-5. El usuario va al checkout de Mercado Pago.
-6. La landing puede recibir parametros de retorno para UX.
-7. La confirmacion real del pago debe venir del webhook y de la consulta server-side a Mercado Pago.
+## Estructura util
 
-## Estado validado en paralelo
-
-Durante la sesion del 2026-04-04 se valido en paralelo este flujo nuevo:
-
-1. Apps Script paralelo recibe `create_lead`.
-2. Guarda el lead en `Leads_Test_Migracion` con `external_reference` unico.
-3. Crea una preferencia dinamica de Mercado Pago con `preference_id` e `init_point`.
-4. Render expone el webhook nuevo y responde correctamente en `/health`.
-5. El checkout dinamico abre correctamente en Mercado Pago para la entrada VIP de `$100.000`.
-
-Todavia no esta certificada de punta a punta la etapa final `Mercado Pago -> webhook -> actualizacion de Sheets` porque no se ejecuto un pago real ni una prueba con credenciales sandbox operativas.
-
-## Estado de produccion
-
-- La landing publica sigue apuntando al Apps Script anterior en `LEAD_ENDPOINT_URL`.
-- El webhook global de Mercado Pago fue restaurado a la URL anterior para no romper conciliacion real.
-- El flujo nuevo sigue desplegado en paralelo en `dev-barbara` y en Render, listo para una prueba final controlada.
-
-## Documentos clave
-
-- Para arquitectura de pagos: `contexto-plan-mercadopago-apps-script.md`
-- Para reglas de trabajo del repo: `.github/copilot-instructions.md`
-- Para contexto comercial: `propuesta-comercial-evento.md`
+- `index.html`: landing principal y unico frontend activo.
+- `integrations/google-apps-script/`: fuente local del script activo.
+- `integrations/mercadopago-webhook/`: webhook server-side.
+- `propuesta-comercial-evento.md`: contexto comercial.
 
 ## Verificacion manual
 
-- usar Live Server en el puerto `5501`;
-- revisar layout desktop y mobile;
-- probar modal y formulario;
-- verificar que el frontend siga esperando `init_point`;
-- revisar comportamiento del retorno post-pago sin tratarlo como fuente final de verdad.
+1. Abrir `index.html` con Live Server en el puerto `5501`.
+2. Probar modal y formulario.
+3. Confirmar que la respuesta del Apps Script devuelva `init_point`.
+4. Confirmar que el webhook responda en `/health`.
+5. No tratar parametros de retorno del navegador como fuente de verdad.
 
-## Nota importante
+## Fuente viva de Apps Script
 
-Si se cambia la logica del Apps Script en produccion y ese cambio no se refleja en `apps_scripts.js`, la documentacion del repo puede quedar desfasada. Cuando el flujo de pago sea parte de una decision importante, confirmar que la copia versionada sigue alineada con el despliegue real.
+La unica fuente viva del Apps Script en este repo es `integrations/google-apps-script/Code.gs`.
+
+Si se actualiza el script en Google Apps Script, el cambio debe bajarse o replicarse manualmente en ese archivo para evitar drift entre lo desplegado y lo versionado.

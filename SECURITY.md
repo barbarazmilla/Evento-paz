@@ -3,23 +3,34 @@
 ## Current posture
 
 - No application secrets should be committed to this repository.
-- Local environment files, private keys, certificates, virtual environments and editor settings are ignored by git.
-- GitHub Actions runs a gitleaks scan on every push and pull request.
+- Local environment files, private keys, certificates and editor noise stay out of git.
+- GitHub Actions runs a gitleaks scan on push and pull request.
 
-## Payment flow constraint
+## Active payment rule
 
-The public landing must not update payment status from browser query parameters.
+The public landing can create leads and open checkout.
 
-That client-side path was removed from the landing because values such as `status`, `payment_id` and `external_reference` can be forged by any public visitor.
+It cannot confirm, reconcile or mutate the final payment state.
 
-## External hardening still required
+## Current trust boundary
 
-The Google Apps Script endpoint used by the landing is not stored in this repository, so it could not be hardened here.
+The trusted path is:
 
-That external endpoint should follow these rules:
+`Mercado Pago -> webhook server-side -> API official lookup -> update_payment -> Google Sheets`
 
-1. Accept public writes only for lead capture, never for payment confirmation.
-2. Reject any public `update_status` action.
-3. Reconcile payment status only from a Mercado Pago webhook or another authenticated server-side process.
-4. Validate and sanitize all incoming fields before writing to Google Sheets.
-5. Add abuse protection such as rate limiting, CAPTCHA or an equivalent anti-spam control if the endpoint stays public.
+The browser is outside that trust boundary.
+
+## Rules that must stay true
+
+1. The Apps Script public action is `create_lead` only.
+2. `update_payment` must stay protected by a shared secret and server-side origin.
+3. Query params such as `status`, `payment_id` and `external_reference` must never close a sale.
+4. Mercado Pago access tokens must never reach the frontend.
+5. All incoming fields must be sanitized before writing to Sheets.
+
+## Remaining hardening work
+
+1. Add stronger abuse protection to the public lead endpoint if volume grows.
+2. Add webhook signature validation from Mercado Pago in the Render service.
+3. Add better logging and observability for reconciliation failures.
+4. Reconfirm that deployed Script Properties match the documented contract.

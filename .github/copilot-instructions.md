@@ -5,13 +5,11 @@
 This repository is a static frontend workspace built around standalone HTML files.
 
 - `index.html` is the main landing page and the default file to update for the live event flow.
-- `landing.html` is an alternate landing variant.
-- `landing-tiendanube.html` is a Tienda Nube specific variant and requires extra care because it is wrapped to avoid theme CSS conflicts.
 - There is no deployable backend inside this repository.
 
 Payment creation, webhook handling, Google Sheets updates, and Mercado Pago API calls still run outside this repo in Google Apps Script.
 
-The file `apps_scripts.js` is a versioned reference copy of the current Apps Script logic. Treat it as documentation and source tracking for the external script, not as code that is executed by this static site.
+The file `integrations/google-apps-script/Code.gs` is the only repository copy of the active Apps Script logic. Treat it as the versioned source copy that must be kept manually in sync with the deployed script.
 
 If a task changes payment behavior, first read [contexto-plan-mercadopago-apps-script.md](../contexto-plan-mercadopago-apps-script.md) and treat it as the source of truth for the intended architecture.
 
@@ -40,10 +38,9 @@ There is no build pipeline or automated test suite in this repo.
 - Do not move Mercado Pago credentials or sensitive logic into the frontend.
 - Treat browser return parameters such as `status`, `collection_status`, `payment_id`, `collection_id`, and `external_reference` as UX or tracking inputs, not as the final source of truth for a paid order.
 - If you touch the Google Apps Script endpoint URL, search for all occurrences and update them consistently.
-- If you edit `landing-tiendanube.html`, preserve its isolation strategy and verify that changes still work inside Tienda Nube markup.
 
 ## Pitfalls
 
 - Critical payment execution is external to this repo. Do not assume the payment flow can be fully fixed from HTML alone.
-- `apps_scripts.js` may lag behind the live Apps Script deployment if someone changes the script outside git. When payment behavior matters, compare the repo copy with the deployed script before making architectural decisions.
+- `integrations/google-apps-script/Code.gs` may lag behind the live Apps Script deployment if someone changes the script outside git. When payment behavior matters, compare the repo copy with the deployed script before making architectural decisions.
 - There is no automated safety net. Manual verification is required after meaningful UI or checkout-flow changes.

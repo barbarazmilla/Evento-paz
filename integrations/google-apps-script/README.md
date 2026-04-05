@@ -1,17 +1,30 @@
-# Google Apps Script Seguro
+# Google Apps Script Activo
 
-Base para usar Google Sheets como almacenamiento de leads sin permitir que el frontend confirme pagos.
+Fuente local del Apps Script que hoy define el contrato de captura y conciliacion.
+
+## Fuente de verdad en repo
+
+La unica copia viva del Apps Script en este proyecto es:
+
+- `integrations/google-apps-script/Code.gs`
+- `integrations/google-apps-script/appsscript.json`
+
+No hay otra copia activa en la raiz.
+
+Si alguien modifica el script directamente en Google Apps Script y no replica el cambio aca, el repo queda desalineado.
 
 ## Que hace
 
-- acepta `create_lead` como accion publica,
-- guarda el lead con `lead_id` y `external_reference`,
-- crea una preferencia dinamica de Mercado Pago por lead,
-- devuelve `init_point` y `preference_id`,
-- acepta `update_payment` solo si recibe un secreto compartido,
-- actualiza el estado del pago en la misma fila del lead.
+1. expone `doGet` para healthcheck,
+2. recibe `create_lead`,
+3. valida y sanitiza el payload,
+4. escribe la fila inicial en Google Sheets,
+5. crea una preferencia dinamica de Mercado Pago,
+6. devuelve `lead_id`, `external_reference`, `preference_id` e `init_point`,
+7. recibe `update_payment` solo con secreto compartido,
+8. actualiza la fila correcta por `external_reference`.
 
-## Propiedades requeridas en Script Properties
+## Script Properties requeridas
 
 - `SPREADSHEET_ID`
 - `LEADS_SHEET_NAME` opcional, por defecto `Leads`
@@ -24,33 +37,45 @@ Base para usar Google Sheets como almacenamiento de leads sin permitir que el fr
 
 1. Crear un proyecto de Apps Script.
 2. Copiar `Code.gs` y `appsscript.json`.
-3. Configurar las Script Properties.
+3. Configurar Script Properties.
 4. Desplegar como Web App.
 5. Ejecutar como tu usuario.
-6. Dar acceso a `Anyone` solo si el endpoint publico se usara para captura de leads.
+6. Dar acceso publico solo porque `create_lead` necesita ser alcanzable desde la landing.
 
-## Accion publica esperada
+## Sync manual recomendado
 
-El frontend puede seguir enviando `FormData` con estos campos:
+1. Editar primero `Code.gs` en el repo.
+2. Copiar el contenido al editor de Google Apps Script.
+3. Verificar `appsscript.json` si hubo cambios de manifest.
+4. Desplegar una nueva version como Web App.
+5. Confirmar que la URL activa siga siendo la esperada en `index.html`.
+6. Ejecutar `doGet` y una prueba de `create_lead`.
 
+Si el cambio se hizo directamente en Google Apps Script, bajar ese cambio manualmente al repo el mismo dia.
+
+## Accion publica
+
+El frontend envia `FormData` con:
+
+- `action=create_lead`
 - `nombre`
 - `email`
 - `telefono`
 - `tipo_entrada`
 - `source` opcional
+- `website` como honeypot opcional
 
-Si `action` no viene informado, el script asume `create_lead`.
+Respuesta exitosa:
 
-La respuesta exitosa ahora devuelve:
-
+- `ok`
 - `lead_id`
 - `external_reference`
 - `preference_id`
 - `init_point`
 
-## Accion privada esperada
+## Accion privada
 
-El webhook server-side debe enviar JSON con:
+El webhook server-side envia JSON con:
 
 - `action: update_payment`
 - `webhook_secret`
@@ -62,40 +87,48 @@ El webhook server-side debe enviar JSON con:
 - `currency_id`
 - `approved_at`
 
-## Prueba rapida con curl
+## Pruebas manuales
 
-Ejemplo de alta de lead:
+### Healthcheck
+
+`GET /exec`
+
+Respuesta esperada:
+
+```json
+{"ok":true,"service":"lead-capture","version":1}
+```
+
+### Alta de lead
 
 ```bash
 curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec' \
-	-F 'action=create_lead' \
-	-F 'nombre=Barbara Test' \
-	-F 'email=barbara@example.com' \
-	-F 'telefono=5491100000000' \
-	-F 'tipo_entrada=VIP' \
-	-F 'source=prueba_manual'
+  -F 'action=create_lead' \
+  -F 'nombre=Barbara Test' \
+  -F 'email=barbara@example.com' \
+  -F 'telefono=5491100000000' \
+  -F 'tipo_entrada=VIP' \
+  -F 'source=prueba_manual'
 ```
 
-Ejemplo de actualizacion privada:
+### Actualizacion privada
 
 ```bash
 curl -X POST 'https://script.google.com/macros/s/REEMPLAZAR/exec' \
-	-H 'Content-Type: application/json' \
-	-d '{
-		"action": "update_payment",
-		"webhook_secret": "REEMPLAZAR",
-		"external_reference": "ext_123",
-		"payment_id": "999999999",
-		"status": "approved",
-		"status_detail": "accredited",
-		"transaction_amount": "100000",
-		"currency_id": "ARS",
-		"approved_at": "2026-04-04T20:00:00Z"
-	}'
+  -H 'Content-Type: application/json' \
+  -d '{
+    "action": "update_payment",
+    "webhook_secret": "REEMPLAZAR",
+    "external_reference": "ext_123",
+    "payment_id": "999999999",
+    "status": "approved",
+    "status_detail": "accredited",
+    "transaction_amount": "100000",
+    "currency_id": "ARS",
+    "approved_at": "2026-04-04T20:00:00Z"
+  }'
 ```
 
-## Nota
+## Observacion
 
-La preferencia se crea con `external_reference` y `notification_url`, lo que permite conciliar el pago server-side desde el webhook.
-
-Esto sigue siendo una base liviana. Si el volumen sube o necesitás controles mas finos, conviene migrar la conciliacion a un backend real y dejar Apps Script solo como adaptador de Sheets.
+Este script sigue siendo una solucion liviana. Si la operacion escala, conviene mover la conciliacion a un backend mas fuerte y dejar Apps Script como adaptador de Sheets.

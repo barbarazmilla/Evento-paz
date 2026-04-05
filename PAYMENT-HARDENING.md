@@ -2,82 +2,74 @@
 
 ## Objetivo
 
-Dejar el flujo de leads y pagos en un estado donde el frontend publico no pueda falsificar estados de pago ni escribir datos sensibles sin control.
+Mantener el flujo en un estado donde el frontend publico no pueda alterar conciliacion financiera ni inventar pagos aprobados.
 
 ## Regla base
 
 El navegador solo puede:
 
-1. enviar leads,
-2. abrir el checkout,
-3. mostrar mensajes al usuario.
+1. enviar el lead,
+2. recibir el `init_point`,
+3. abrir el checkout,
+4. mostrar mensajes al usuario.
 
-El navegador no debe:
+El navegador no puede:
 
 1. confirmar pagos,
-2. actualizar estados de pago,
-3. decidir si una operacion fue aprobada,
-4. escribir datos de conciliacion financiera por cuenta propia.
+2. llamar acciones privadas,
+3. decidir si una venta quedo cerrada,
+4. escribir estado financiero final.
 
-## Google Apps Script
+## Apps Script actual
 
-1. Separar acciones publicas y privadas.
-2. Permitir `create_lead` como unica accion publica.
-3. Rechazar `update_status`, `confirm_payment` o cualquier accion similar si llega desde el frontend.
-4. Validar longitud, formato y presencia de `nombre`, `email`, `telefono` y `tipo_entrada`.
-5. Sanitizar texto antes de escribir en Sheets.
-6. Limitar origenes permitidos si la implementacion lo soporta.
-7. Agregar rate limit basico por IP o por ventana temporal.
-8. Agregar CAPTCHA o una proteccion anti-spam equivalente si el endpoint queda abierto.
-9. Guardar fecha de alta, fuente, ticket, y un `lead_id` interno unico.
-10. No devolver informacion sensible al cliente.
+1. `create_lead` es la unica accion publica.
+2. `update_payment` requiere `webhook_secret`.
+3. Existe honeypot anti-spam basico.
+4. Existe ventana anti-duplicados por cache.
+5. La hoja se valida por encabezados antes de escribir.
+6. La fila se actualiza por `external_reference`.
 
-## Mercado Pago
+## Webhook actual
 
-1. Crear la preferencia de pago del lado servidor o en Apps Script autenticado, no desde el cliente si implica credenciales.
-2. Generar y guardar un `external_reference` unico por lead.
-3. Registrar `lead_id`, `external_reference`, ticket y monto esperado antes de abrir el checkout.
-4. Configurar webhook de Mercado Pago para recibir notificaciones de pago.
-5. Verificar cada pago contra la API oficial usando credenciales privadas solo del lado servidor.
-6. Actualizar Sheets solo despues de una verificacion server-side real.
-7. Guardar `payment_id`, `status`, `status_detail`, monto, moneda y fecha de confirmacion.
-8. Ignorar callbacks duplicados y hacer idempotencia por `payment_id` o `external_reference`.
+1. Recibe la notificacion de Mercado Pago en Render.
+2. Extrae `payment_id`.
+3. Consulta la API oficial de Mercado Pago con `MP_ACCESS_TOKEN`.
+4. Envia `update_payment` autenticado a Apps Script.
 
-## Flujo recomendado
+## Campos activos en Sheets
 
-1. Usuario completa formulario.
-2. Frontend envia lead al endpoint publico.
-3. Backend o Apps Script privado crea `lead_id` y `external_reference`.
-4. Backend crea preferencia de Mercado Pago.
-5. Frontend redirige al checkout con la URL recibida.
-6. Mercado Pago notifica al webhook.
-7. Backend valida el pago con la API de Mercado Pago.
-8. Backend actualiza Google Sheets con estado confirmado.
-
-## Campos minimos en Google Sheets
-
+- `created_at`
+- `updated_at`
 - `lead_id`
-- `fecha_lead`
+- `external_reference`
+- `payment_status`
+- `payment_status_detail`
+- `payment_id`
 - `nombre`
 - `email`
 - `telefono`
 - `tipo_entrada`
 - `monto_esperado`
-- `external_reference`
-- `payment_id`
-- `payment_status`
-- `payment_status_detail`
+- `transaction_amount`
+- `currency_id`
+- `source`
 - `fecha_confirmacion`
-- `fuente`
 
 ## Validaciones criticas
 
-1. No marcar como pago aprobado solo porque la URL trae `status=approved`.
-2. No confiar en `payment_id` enviado por el navegador.
-3. No confiar en `external_reference` enviado por query params para cerrar una venta.
-4. No usar access tokens de Mercado Pago en frontend.
-5. No dejar endpoints de escritura sin controles minimos de abuso.
+1. No marcar `approved` por query params del navegador.
+2. No confiar en `payment_id` enviado desde el cliente.
+3. No exponer `MP_ACCESS_TOKEN` en frontend.
+4. No aceptar `update_status`, `confirm_payment` o equivalentes desde el browser.
+5. No escribir en Sheets sin sanitizacion minima.
 
-## Señal de que el flujo ya esta bien
+## Trabajo pendiente
 
-El frontend puede romperse o ser manipulado y aun asi no puede cambiar el estado de una venta real.
+1. Certificar un pago real o sandbox funcional de punta a punta.
+2. Agregar validacion de firma de webhook en Render.
+3. Evaluar rate limiting o CAPTCHA si sube el ruido de bots.
+4. Mejorar monitoreo para errores tipo `lead_not_found`.
+
+## Señal de integracion sana
+
+El frontend puede ser manipulado y aun asi no logra cambiar el estado real de una venta.
